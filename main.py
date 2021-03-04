@@ -115,15 +115,15 @@ class TestNoPathMap(BFSSearch):
 if __name__ == '__main__':
     os.system('cls')
 
-    # trial_map = TrialMap(scale_percent=300,add_frame_frequency=50, framerate=100)
-    # trial_map.find_path()
+    trial_map = TrialMap(scale_percent=300,add_frame_frequency=50, framerate=100)
+    trial_map.find_path()
     
-    # cv2.destroyAllWindows()
+    cv2.destroyAllWindows()
 
-    # submission_map = SubmissionMap(scale_percent=200, add_frame_frequency=300, framerate=100)
-    # submission_map.find_path()
+    submission_map = SubmissionMap(scale_percent=200, add_frame_frequency=300, framerate=100)
+    submission_map.find_path()
     
-    # cv2.destroyAllWindows()
+    cv2.destroyAllWindows()
     
     test_no_path_map = TestNoPathMap(scale_percent=300, add_frame_frequency=50, framerate=100)
     test_no_path_map.find_path()

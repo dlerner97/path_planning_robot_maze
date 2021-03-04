@@ -44,13 +44,13 @@ class BFSSearch(VideoBuffer):
     def __init__(self, vid_name, start_pos_def, goal_pos_def, scale_percent=100, add_frame_frequency=100, framerate = 100):
         # Init VideoBuffer Parent
         super().__init__(framerate=framerate, scale_percent=scale_percent)
-        
+        print("\n=====================================================================================\n")
         # Query user for positions
         def get_user_input(pos_string, default):
             
             # Query until user has input legal values     
             while True:
-                start_str = input(f"Enter {pos_string} position as x,y (0 <= x <= {self.width-1} ',' and 0 <= y <= {self.height-1}) or just enter for default: ")
+                start_str = input(f"Enter {pos_string} position as x,y (0 <= x <= {self.width-1} ',' and 0 <= y <= {self.height-1}) or leave blank to apply the default values: ")
                 start_str_nw = start_str.replace(" ", "")
                 
                 # If empty string, set values to default
@@ -83,8 +83,9 @@ class BFSSearch(VideoBuffer):
         self.start_pos = get_user_input("start", start_pos_def)
         print("")
         self.goal_pos = get_user_input("goal", goal_pos_def)
+        print("\n=====================================================================================")
         
-        print("\nSelect image window and press any key to begin.\nHit 'ctrl+C' at any time to quit execution.")
+        print("\nSelect image window and press any key to begin. Regardless, code will run in 10 seconds\nHit 'ctrl+C' at any time to quit execution.")
         
         # Add start/goal positions to grid
         temp_grid = self.grid.copy()
@@ -94,7 +95,7 @@ class BFSSearch(VideoBuffer):
         
         # Display grid
         self.scale_percent = scale_percent
-        BFSSearch.show_grid(self.grid, scale_percent)
+        BFSSearch.show_grid(self.grid, scale_percent, wait=10000)
         cv2.destroyAllWindows()
         self.frames.append(self.grid)
         
@@ -189,6 +190,7 @@ class BFSSearch(VideoBuffer):
                     self.frames.append(self.grid.copy())
                     count = 0
             
+            print("\n=====================================================================================")
             if solution_found:
                 # Go up the dictionary tree to find all parent nodes and optimized path
                 next_set = self.parent_info[BFSSearch.pos2str(self.goal_pos)]
@@ -232,9 +234,10 @@ class BFSSearch(VideoBuffer):
             # Save and write video feed
             self.save(self.video_name + "_animation", True)
             print(f"The video file can be found in your current directory under {self.video_name}_animation.avi")
+            print("\n=====================================================================================\n")
 
             # Display grid
-            BFSSearch.show_grid(self.grid, self.scale_percent)   
+            BFSSearch.show_grid(self.grid, self.scale_percent, wait=10000)   
                
         except KeyboardInterrupt:
             print("Keyboard Interrupt")
