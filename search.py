@@ -2,6 +2,7 @@ import cv2
 import time
 import math
 import queue
+import heapq
 import operator
 import numpy as np
 import matplotlib.pyplot as plt
@@ -46,7 +47,7 @@ class VideoBuffer():
 # This class handles the general search implementation. To run this code, however 
 class Search(VideoBuffer):
     # Takes in video_name, default start/goal positions, output feed scale factor, number of nodes between subsequent frames, video framerate
-    def __init__(self, map, cost_algorithm=False, scale_percent=100, add_frame_frequency=100, framerate = 100):
+    def __init__(self, map, radius=0, clearence=0, cost_algorithm=False, scale_percent=100, add_frame_frequency=100, framerate = 100):
         # Init VideoBuffer Parent
         super().__init__(framerate=framerate, scale_percent=scale_percent)
         print("\n=====================================================================================\n")
@@ -54,7 +55,7 @@ class Search(VideoBuffer):
         # Define map
         self.video_name, self.grid, self.height, self.width = map.gen_grid()
         start_pos_def = (10, self.height//2)
-        goal_pos_def = (self.width-10, self.height//2)
+        goal_pos_def = (self.width-2, self.height//2)
         
         # Query user for positions
         def get_user_input(pos_string, default):            
@@ -110,22 +111,51 @@ class Search(VideoBuffer):
         self.frames.append(self.grid)
         
         # Define variables
-        self.current_set = queue.Queue()                                                # Queue of states to inspect 
+        #                                                 
         orig_parent_loc_string = str(self.start_pos[0]) + " " + str(self.start_pos[1])
         if cost_algorithm:
             self.node_info = {orig_parent_loc_string : {"cost_from_first": 0}}          # Dictionary of node info
-            self.current_set.put_nowait((self.start_pos, 0))
+            self.current_set = [(0, self.start_pos)]
+            heapq.heapify(self.current_set)
+            self.q_set = lambda cost, pos: heapq.heappush(self.current_set, (cost, pos))
+            self.q_get = lambda: heapq.heappop(self.current_set)
         else:
             self.node_info = {orig_parent_loc_string : {}}          # Dictionary of node info
-            self.current_set.put_nowait(self.start_pos)
+            self.current_set = queue.Queue()                            # Queue of states to inspect
+            self.q_set = lambda pos: self.current_set.put_nowait(pos)
+            self.q_get = lambda: self.current_set.get_nowait()
+            self.q_set(self.start_pos)
                                                            
         self.add_frame_frequency = round(add_frame_frequency/8)        
         self.uint8_0 = np.uint8(0)                                                       # Define a 0 as an 8-bit unsigned int. This will save processing time    
+        self.radius = radius
+        self.clearence = clearence 
+        self.obstacle_dict = {}
           
     # Convert position tuple into string for dictionary storage
     @staticmethod
     def pos2str(pos):
         return str(pos[0]) + " " + str(pos[1]) 
+    
+    def no_obstacles(self, curr_pos):
+        if self.grid[curr_pos[1], curr_pos[0]][-1] != self.uint8_0:
+            return False
+        if self.radius + self.clearence == 0:
+            return True
+            
+        r = self.radius + self.clearence
+        
+        from_x = max(0, curr_pos[0]-r)
+        to_x = min(self.width-1, curr_pos[0]+r)
+        from_y = max(0, curr_pos[1]-r)
+        to_y = min(self.height-1, curr_pos[1]+r)
+        
+        wall_indeces = np.where(self.grid[from_y:to_y, from_x:to_x, -1] != self.uint8_0)
+        # print(wall_indeces)
+        for x, y in zip(wall_indeces[0]-r, wall_indeces[1]-r):
+            if np.linalg.norm([x,y]) < r:
+                return False
+        return True
         
     # Protected method for searching the current current queue and generate all depth levels. 
     # This method and the _find_path method are protected since they can not be run alone. This is a general method and does not implement any specific search algorithm.
@@ -139,13 +169,15 @@ class Search(VideoBuffer):
         c1 = 0
         try:
             while (not solution_found):
-                
-                # If queue is empty, stop
-                if self.current_set.empty():
+
+                # Pull state from queue and check subsequent nodes
+                try:
+                    parent = self.q_get()
+                except IndexError:
+                    break
+                except queue.Empty:
                     break
                 
-                # Pull state from queue and check subsequent nodes
-                parent = self.current_set.get_nowait()
                 solution_found = self._check_subsequent_nodes(parent)
                 
                 # Only add frame to video at specified intervals
@@ -167,7 +199,7 @@ class Search(VideoBuffer):
                 path = [num_list]
                 try:
                     while True:
-                        print('-'*10)
+                        # print('-'*10)
                         next_set_ind = next_set['parent']
                         next_set = self.node_info[next_set_ind]
                         
@@ -175,24 +207,12 @@ class Search(VideoBuffer):
                         str_list = next_set_ind.split(" ")
                         num_list = (int(str_list[0]), int(str_list[1]))
                         path.append(num_list)
-                        
-                        # print(num_list)
-                        # for move in self.action_set.values():
-                        #     try:    
-                        #         print('-'*3)
-                        #         pos = tuple(map(operator.add, move['move'], num_list))
-                        #         print(move['move'], pos)
-                        #         node_info = self.node_info[Search.pos2str(pos)]
-                        #         print(node_info)
-                        #         print('tot cost:', node_info['cost_from_first']+move['cost'])
-                        #     except:
-                        #         continue
                             
                         # Change grid color and add frames to video
                         self.grid[num_list[1], num_list[0]] = (0,255,0)
                         self.frames.append(self.grid.copy())
                         # self.show_grid(self.grid, 300)
-                        print('-'*10)
+                        # print('-'*10)
                 except KeyError:
                     pass
 
@@ -208,11 +228,11 @@ class Search(VideoBuffer):
                 time_elapsed_secs = time_elapsed_s%60
                 
                 print(f"\nThis path can be solved in {len(self.path)-1} moves")
-                print(f"The BFS algorithm took {time_elapsed_hrs} hrs, {time_elapsed_mins} mins, and {time_elapsed_secs} s to implement.\n")
+                print(f"The {self.__class__.__name__} algorithm took {time_elapsed_hrs} hrs, {time_elapsed_mins} mins, and {time_elapsed_secs} s to implement.\n")
               
             # If no solution was found
             else:
-                print("\nThe BFS algorithm cannot detect a path. Please select new start and goal points or remove obstacles from the grid.")
+                print("\nThe {self.__class__.__name__} algorithm cannot detect a path. Please select new start and goal points or remove obstacles from the grid.")
                
             # Save and write video feed
             self.save(self.video_name + "_animation", True)
@@ -224,11 +244,12 @@ class Search(VideoBuffer):
                
         except KeyboardInterrupt:
             print("Keyboard Interrupt")
+            self.save(self.video_name + "_animation_INTERRUPT", True)
 
 # The BFSSearch class is a wrapper for search.            
 class BFSSearch(Search):
-    def __init__(self, map, scale_percent, add_frame_frequency, framerate):
-        super().__init__(map, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
+    def __init__(self, map, radius, clearence, scale_percent, add_frame_frequency, framerate):
+        super().__init__(map, radius=radius, clearence=clearence, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
         self.action_set = {
             "up"         :  (0,-1),
             "up_right"   :  (1,-1),
@@ -270,7 +291,7 @@ class BFSSearch(Search):
                 
                 # Update queue and parent info
                 self.node_info[loc_string] = {"parent": parent_loc_string}
-                self.current_set.put_nowait(pos)
+                self.q_set(pos)
         return False
     
     # Check all subsequent directions for a given position
@@ -288,8 +309,8 @@ class BFSSearch(Search):
         self._find_path()
 
 class DijkstraSearch(Search):
-    def __init__(self, map, scale_percent, add_frame_frequency, framerate):
-        super().__init__(map, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
+    def __init__(self, map, radius, clearence, scale_percent, add_frame_frequency, framerate):
+        super().__init__(map, radius=radius, clearence=clearence, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
         self.action_set = {
             "up"         : {"move":  (0,-1), "cost": 1},
             "up_right"   : {"move":  (1,-1), "cost": math.sqrt(2)},
@@ -303,8 +324,7 @@ class DijkstraSearch(Search):
     
     def _get_next_branch(self, parent, from_dir, branch_cost):  
         # Get the new position using tuple addition
-        parent_cost = parent[1]
-        parent = parent[0]
+        parent = parent[1]
         pos = tuple(map(operator.add, parent, (from_dir)))
         
         # Check if new position is on the grid
@@ -317,6 +337,7 @@ class DijkstraSearch(Search):
         if (on_grid):
             loc_string = Search.pos2str(pos) 
             parent_loc_string = Search.pos2str(parent)
+            parent_cost = self.node_info[parent_loc_string]["cost_from_first"]
             cost_from_first = parent_cost+branch_cost
             
             # If position corresponds to the winning state, return True
@@ -328,13 +349,7 @@ class DijkstraSearch(Search):
             color = self.grid[pos[1], pos[0]]
             if color[-1] == self.uint8_0:
                 # Check if the node has already been visited
-            
-                print("-"*10) 
-                print(f"pos: {pos}, parent: {parent}")
-                print(f"branch cost: {branch_cost}, parent cost: {parent_cost}, total cost: {cost_from_first}")
-                
                 node_info = self.node_info.get(loc_string)
-                print(f"Node info: {node_info}")
                 
                 if node_info == None:
                     # Change pixel color to blue unless it overlaps with the start and end depictions
@@ -343,24 +358,90 @@ class DijkstraSearch(Search):
                     
                     # Update queue and parent info
                     self.node_info[loc_string] = {"parent": parent_loc_string, "cost_from_first": cost_from_first}
-                    self.current_set.put_nowait((pos, cost_from_first))
-                    print(self.node_info[loc_string])
+                    self.q_set(cost_from_first, pos)
+                    # print(self.node_info[loc_string])
                 
                 elif cost_from_first < node_info["cost_from_first"]:
-                    # print('-'*10)
-                    # print(pos)
-                    # print(self.node_info[loc_string])
                     self.node_info[loc_string] = {"parent": parent_loc_string, "cost_from_first": cost_from_first}
-                    self.grid[pos[1], pos[0]] = (255,255,0)
-                    print(self.node_info[loc_string])
-                    # print('-'*10)
                     
         return False
         
     def _check_subsequent_nodes(self, parent):
         # Check all directions
         found_goal = False
-        print("\n", "="*10, sep="")
+        for branch_info in self.action_set.values(): 
+            found_goal = self._get_next_branch(parent, branch_info['move'], branch_info['cost']) or found_goal
+        
+        # If any of these are true, we have reached the goal state. Propogate the true to the next level
+        return found_goal
+    
+    def find_path(self):
+        self._find_path()
+        
+class AStarSearch(Search):
+    def __init__(self, map, radius, clearence, scale_percent, add_frame_frequency, framerate):
+        super().__init__(map, radius=radius, clearence=clearence, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
+        
+        self.action_set = {
+            "up"         : {"move":  (0,-1), "cost": 1},
+            "up_right"   : {"move":  (1,-1), "cost": math.sqrt(2)},
+            "right"      : {"move":   (1,0), "cost": 1},
+            "down_right" : {"move":   (1,1), "cost": math.sqrt(2)},
+            "down"       : {"move":   (0,1), "cost": 1},
+            "down_left"  : {"move":  (-1,1), "cost": math.sqrt(2)},
+            "left"       : {"move":  (-1,0), "cost": 1},
+            "up_left"    : {"move": (-1,-1), "cost": math.sqrt(2)},
+        }
+        
+    def _get_next_branch(self, parent, from_dir, branch_cost):  
+        # Get the new position using tuple addition    
+        parent = parent[1] 
+        pos = tuple(map(operator.add, parent, (from_dir)))
+        
+        # Check if new position is on the grid
+        on_grid =             pos[1] < self.height
+        on_grid = on_grid and pos[1] >= 0
+        on_grid = on_grid and pos[0] < self.width
+        on_grid = on_grid and pos[0] >= 0 
+        
+        # Check if move is legal and generate that new state
+        if (on_grid):
+            loc_string = Search.pos2str(pos) 
+            parent_loc_string = Search.pos2str(parent)
+            parent_cost = self.node_info[parent_loc_string]["cost_from_first"]
+            cost_from_first = parent_cost+branch_cost
+            total_cost = cost_from_first + math.sqrt((self.goal_pos[0]-pos[0])**2 + (self.goal_pos[1]-pos[1])**2)
+            
+            # If position corresponds to the winning state, return True
+            if pos[0] == self.goal_pos[0] and pos[1] == self.goal_pos[1]:
+                self.node_info[loc_string] = {"parent": parent_loc_string, "cost_from_first": cost_from_first}
+                return True 
+                       
+            # Check if the node is on an obstacle
+            color = self.grid[pos[1], pos[0]]
+            # if color[-1] == self.uint8_0:
+            if self.no_obstacles(pos):
+                # Check if the node has already been visited
+                node_info = self.node_info.get(loc_string)
+                
+                if node_info == None:
+                    # Change pixel color to blue unless it overlaps with the start and end depictions
+                    if color[1] == self.uint8_0:
+                        self.grid[pos[1], pos[0]] = (255,0,0)
+                    
+                    # Update queue and parent info
+                    self.node_info[loc_string] = {"parent": parent_loc_string, "cost_from_first": cost_from_first}
+                    self.q_set(total_cost, pos)
+                    # print(self.node_info[loc_string])
+                
+                elif cost_from_first < node_info["cost_from_first"]:
+                    self.node_info[loc_string] = {"parent": parent_loc_string, "cost_from_first": cost_from_first}
+                    
+        return False
+        
+    def _check_subsequent_nodes(self, parent):
+        # Check all directions
+        found_goal = False
         for branch_info in self.action_set.values(): 
             found_goal = self._get_next_branch(parent, branch_info['move'], branch_info['cost']) or found_goal
         
