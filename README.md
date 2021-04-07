@@ -22,13 +22,18 @@ To run the code, change the directory to proj2_dani_lerner folder. i.e.
 cd your_path/proj2_dani_lerner
 ```
 
-To run a given test case, merely go into main.py and comment out everything but the given test case initialization and find_path function. To test discrete cases, comment out the
+To run a given test case, merely go into main.py and comment out everything but the given test case initialization and find_path function. All search algorithms can be used with both types of action sets and all created maps. There are 3 maps: TestMap (relatively simple map), SubmissionMap (more complicated map), and TestNoPathMap (no possible path between start and goal locations). 
+Furthermore, there are two types of action sets:
+1. Discrete. In this case, the robot moves in the cardinal directions or diagnolly. These can be set by the user.
+2. The other case works for mobile robots which can turn a certain number of degrees and traverse by a fixed radius. Many of these parameters can be set according to the user and others will be set by the command line. Examples of input parameters can be seen on the script.
+
+To test discrete cases, comment out the
 
 ```python
 action_set = search.Search.gen_robot_action_set()
 ```
 
-line. This line resets the action set to a non-discrete case.
+line. This line resets the action set to the non-discrete case.
 
 The name of the python file is simply "main.py".
 To run the main, type ...
