@@ -45,3 +45,6 @@ python main.py
 The search will prompt the user for certain attributes and others can be defined in the main function.
 
 Please follow all terminal instructions once the program starts.
+
+Videos can be found in this playlist:
+https://www.youtube.com/watch?v=Rhwp2Mofshw&list=PLoQLXWMjdIjRBjriZcNAFHTQGuJDQBsIJ&index=1&ab_channel=DaniLerner
