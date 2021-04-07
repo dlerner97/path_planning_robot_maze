@@ -1,10 +1,17 @@
+#<=============================== Imports ===================================>#
 import cv2
 import math
 import numpy as np
 
-# Parent: BFSSearch
-# This class builds the trial map and runs the BFS algorithm on it
-class TrialMap:       
+#<=============================== TrialMap Class Definition ===================================>#
+class TrialMap:  
+    
+    """
+    Trial Map
+    
+    This class builds the trial map and can be passed into the search algorithms as parameters
+    """
+         
     # Build grid with red obstacles
     @staticmethod
     def gen_grid():
@@ -16,10 +23,15 @@ class TrialMap:
         center_circ = (width-1-40, 50-1)
         cv2.circle(grid, center_circ, 15, (0,0,255), -1)            # Circle
         return "trial_map", grid[::-1,:], height, width        
-    
-# Parent: BFSSearch
-# This class builds the submission map and runs the BFS algorithm on it    
+        
+#<=============================== SubmissionMap Class Definition ===================================>#
 class SubmissionMap:
+    
+    """
+    Submission Map
+    
+    This class builds the submission map and can be passed into the search algorithms as parameters
+    """
     
     # Build grid with red obstacles
     @staticmethod
@@ -65,24 +77,31 @@ class SubmissionMap:
         cv2.fillPoly(grid, [pts], (0,0,255))
         
         # Right polygon
-        angle_low = deg2rad(45)
-        bot = [width-1-72, 63-1]
-        right_x = bot[0] + int_(75*math.cos(angle_low))
-        right_bot_y = bot[1] + int_(75*math.sin(angle_low))
-        mid_right = [right_x, right_bot_y]
-        top_right = [right_x, right_bot_y+55]
-        left = [bot[0]+int_(60*math.cos(angle_low+deg2rad(90))), bot[1]+int_(60*math.sin(angle_low+deg2rad(90)))]
-        top_mid = [left[0]+int_(60*math.cos(angle_low)), left[1]+int_(60*math.sin(angle_low))]
-        bot_mid = [354-1, 138-1]
-        pts = np.array([bot, mid_right, top_right, bot_mid, top_mid, left], np.int32).reshape((-1,1,2))
-        cv2.fillPoly(grid, [pts], (0,0,255))
+        # angle_low = deg2rad(45)
+        # bot = [width-1-72, 63-1]
+        # right_x = bot[0] + int_(75*math.cos(angle_low))
+        # right_bot_y = bot[1] + int_(75*math.sin(angle_low))
+        # mid_right = [right_x, right_bot_y]
+        # top_right = [right_x, right_bot_y+55]
+        # left = [bot[0]+int_(60*math.cos(angle_low+deg2rad(90))), bot[1]+int_(60*math.sin(angle_low+deg2rad(90)))]
+        # top_mid = [left[0]+int_(60*math.cos(angle_low)), left[1]+int_(60*math.sin(angle_low))]
+        # bot_mid = [354-1, 138-1]
+        # pts = np.array([bot, mid_right, top_right, bot_mid, top_mid, left], np.int32).reshape((-1,1,2))
+        # cv2.fillPoly(grid, [pts], (0,0,255))
             
         return "submission_map", grid[::-1,:], height, width  
-  
-# Parent: BFSSearch
-# This class builds a map with no path between the left and right-hand sides.
-# It displays the the algorithms ability to understand that no path is possible      
+      
+#<=============================== TestNoPathMap Class Definition ===================================>#
 class TestNoPathMap:
+    
+    """
+    No Possible Path Map
+    
+    This class builds the "Test No Path" map and can be passed into the search algorithms as parameters
+    
+    This class builds a map with no path between the left and right-hand sides.
+    It displays the the algorithms ability to understand that no path is possible 
+    """
     
     # Build grid with red obstacles
     @staticmethod
