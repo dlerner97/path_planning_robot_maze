@@ -1,0 +1,8 @@
+prefix=/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_msgs
+
+Name: turtlebot3_msgs
+Description: Description of turtlebot3_msgs
+Version: 1.0.1
+Cflags: -I/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_msgs/include
+Libs: -L${prefix}/lib 
+Requires: std_msgs message_runtime

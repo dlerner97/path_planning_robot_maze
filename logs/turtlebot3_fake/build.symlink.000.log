@@ -1,0 +1,4 @@
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/turtlebot3_fake/turtlebot3_fake_node
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/pkgconfig/turtlebot3_fake.pc
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_fake/cmake/turtlebot3_fakeConfig.cmake
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_fake/cmake/turtlebot3_fakeConfig-version.cmake

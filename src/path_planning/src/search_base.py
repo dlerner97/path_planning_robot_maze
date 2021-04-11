@@ -45,6 +45,7 @@ class VideoBuffer:
         size = (shape[1], shape[0])
         videowriter = cv2.VideoWriter(video_name + ".avi", cv2.VideoWriter_fourcc(*'DIVX'),self.framerate , size, isColor)
         for f in self.frames:
+            f = cv2.UMat(f)
             cv2.circle(f, self.start_pos[:2], 5, (0,255,0), -1)
             cv2.circle(f, self.goal_pos[:2], 5, (0,255,0), -1)
             videowriter.write(f)
@@ -72,7 +73,10 @@ class Search(VideoBuffer):
         start_pos_def = (10, self.height//2)
         goal_pos_def = (self.width-2, self.height//2)
         
-        self.discrete = action_set["discrete"]
+        if action_set["move_type"] == "discrete":
+            self.discrete = True
+        else:
+            self.discrete = False
         
         # Query user for positions
         def get_pos_user_input(pos_string, default):
@@ -211,9 +215,9 @@ class Search(VideoBuffer):
             goal_threshold_xy = scale*goal_threshold[0]
             ang = lambda pos: abs(add_angs(pos[2], -self.goal_pos[2])) <= goal_threshold[1] or abs(add_angs(pos[2], -self.goal_pos[2])) >= 360-goal_threshold[1]
             self.at_goal_pos = lambda pos: math.dist(pos[:2], self.goal_pos[:2]) < goal_threshold_xy and ang(pos)
-            
-            # Check if angles meet threshold
-            self.angle_thresh = lambda theta, theta_i: abs(theta-theta_i) > self.angle_threshold and abs(theta-theta_i) <= 360-self.angle_threshold
+        
+        # Check if angles meet threshold
+        self.angle_thresh = lambda theta, theta_i: abs(theta-theta_i) > self.angle_threshold and abs(theta-theta_i) <= 360-self.angle_threshold
          
         # Append frame
         self.frames.append(self.grid)
@@ -247,93 +251,7 @@ class Search(VideoBuffer):
         self.radius *= scale
         self.clearence *= scale 
         self.action_set = action_set["action_set"]
-          
-    # Generate robot move action set
-    @staticmethod      
-    def gen_robot_action_set(node_threshold_xy=0.5, node_threshold_theta=30, goal_threshold_xy=1.5, goal_threshold_theta=30, max_add_turn_cost=0):
-        print("\n=====================================================================================\n")
-        
-        dist_def = 5
-        dist_bounds = (1, 10)
-        
-        theta_def = 30
-        theta_bounds = (1, 179)
-        
-        n_branches_def = 5
-        n_branch_bounds = (1, 10)
-        
-        # Query user for positions
-        def get_user_input(pos_string, default, bounds):
-            prompt = None
-            if pos_string == "dist":
-                prompt = f"Enter step size distance ({bounds[0]} <= step size <= {bounds[1]}) or leave blank to apply the default value: "
-            elif pos_string == "theta":
-                prompt = f"Enter angle theta ({bounds[0]} < theta < {bounds[1]}) or leave blank to apply the default value: "
-            else:
-                prompt = f"Enter number of possible branches (should be odd) or leave blank to apply the default value: "
-                        
-            # Query until user has input legal values     
-            while True:
-                start_str = input(prompt)
-                start_str_nw = start_str.replace(" ", "")
-                
-                # If empty string, set values to default
-                if start_str_nw == '':
-                    print("Selecting default value: ", default)
-                    return default              
-                                    
-                # Check for incorrect input
-                try:
-                    val = int(start_str_nw)
-                except:
-                    print("Please type a single integer.\n")
-                    continue    
-                
-                # Check if position out of bounds
-                if val < bounds[0] or val > bounds[1]:
-                    print("Numbers out of bounds. Please select new value.\n")
-                    continue
-
-                # User chose correct inputs
-                return val
-        
-        
-        
-        # Define start/goal positions
-        dist = get_user_input("dist", dist_def, dist_bounds)
-        print("")
-        theta = get_user_input("theta", theta_def, theta_bounds)        
-        print("")
-        n_branches = get_user_input("branches", n_branches_def, n_branch_bounds)            
-        print("\n=====================================================================================")
-        
-        # Init dict
-        action_set = {
-            "discrete" : False,
-            "node_threshold" : (node_threshold_xy, node_threshold_theta),
-            "goal_threshold" : (goal_threshold_xy, goal_threshold_theta),
-            "action_set" : {}
-        }
-        # Apply action set
-        even = False
-        if n_branches%2 == 0:
-            even = True
-              
-        dist /= node_threshold_xy
-        max_turn = None
-        turn_defined = False
-        for i in range(n_branches):
-            t = None
-            if even:
-                t = (n_branches//2 - i)*theta - theta//2
-            else:
-                t = (n_branches//2 - i)*theta 
-            if not turn_defined:
-                turn_defined = True
-                max_turn = t
-            action_set["action_set"][i] = {'move' : (dist, t), "cost" : dist+abs(max_add_turn_cost*t/max_turn)}
-        return action_set
-            
+                      
     # Convert position tuple into string for dictionary storage
     @staticmethod
     def pos2str(pos):
@@ -421,6 +339,9 @@ class Search(VideoBuffer):
                 next_set_ind = next_set['parent']
                 path = [next_set_ind]
                 action_path = [next_set['action']]
+                if not self.discrete:
+                    self.grid = cv2.UMat(self.grid)
+                
                 try:
                     while True:
                         next_set_ind = next_set['parent']
@@ -428,25 +349,32 @@ class Search(VideoBuffer):
                         next_set = self.node_info[Search.pos2str(next_set_ind)][next_set_ind[2]]                        
                         path.append(next_set_ind)
                         action_path.append(next_set["action"])
-                                                   
+         
                         # Change grid color and add frames to video
-                        cv2.circle(self.grid, (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
-                        cv2.circle(self.grid, (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
-                        self.grid[(next_set_ind[1], next_set_ind[0])] = (0,255,0)
-                        self.frames.append(self.grid.copy())
-                        
+                        if self.discrete:
+                            self.grid[(next_set_ind[1], next_set_ind[0])] = (0,255,0)
+                        else:
+                            cv2.circle(self.grid, (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
+                            cv2.circle(self.grid, (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
+                            self.frames.append(self.grid)
+
                         if next_set_ind[0] == self.start_pos[0] and next_set_ind[1] == self.start_pos[1]:
                             break
                 except KeyError:
                     pass
 
+                if not self.discrete:
+                    self.grid = self.grid.get()
+
                 # Print full move set
                 path.reverse()
                 self.path = np.asarray(path)
 
+                action_path.append((0,0))
                 action_path.reverse()
                 self.action_path = action_path
 
+                # self.grid = self.grid.get()
                 self.grid[self.path[:, 1], self.path[:, 0]] = (0,255,0)
                 
                 # Calculate time elapsed

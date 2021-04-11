@@ -1,0 +1,8 @@
+prefix=/home/dani/Documents/ENPM661/path_planning_robot_maze/install
+
+Name: path_planning
+Description: Description of path_planning
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib -lpath_planning
+Requires: geometry_msgs nav_msgs rospy tf

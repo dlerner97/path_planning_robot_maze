@@ -4,28 +4,20 @@ import os
 import math
 import search
 import trial_maps as maps
+from action_generator import RobotActionSetGenerator
 
 #<=============================== Main ===================================>#
 if __name__ == '__main__':
     os.system('cls')
 
     # Action set for discrete moves
-    action_set = {
-        "action_set" : {
-            "up"         : {"move":  (0,-1), "cost": 1},
-            "up_right"   : {"move":  (1,-1), "cost": math.sqrt(2)},
-            "right"      : {"move":   (1,0), "cost": 1},
-            "down_right" : {"move":   (1,1), "cost": math.sqrt(2)},
-            "down"       : {"move":   (0,1), "cost": 1},
-            "down_left"  : {"move":  (-1,1), "cost": math.sqrt(2)},
-            "left"       : {"move":  (-1,0), "cost": 1},
-            "up_left"    : {"move": (-1,-1), "cost": math.sqrt(2)},
-        },
-        "discrete"       : True,
-    }
+    action_set = RobotActionSetGenerator.gen_robot_discrete_action_set(
+        diagnol = True,
+        move_amt = 1
+    )
     
     #  Action set for turning robots
-    action_set = search.Search.gen_robot_action_set(
+    action_set = RobotActionSetGenerator.gen_robot_rt_action_set(
         node_threshold_xy = 0.5,                                    # Euclidean distance threshold for considering two nodes having the same pos
         node_threshold_theta = 30,                                  # Threshold for considering two nodes having the same angle
         goal_threshold_xy = 1.5,                                    # Euclidean distance threshold for node being close enough to goal pos

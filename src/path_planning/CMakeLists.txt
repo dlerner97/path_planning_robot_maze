@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   rospy
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -104,8 +105,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES path_planning
-#  CATKIN_DEPENDS geometry_msgs nav_msgs rospy
+ LIBRARIES path_planning
+ CATKIN_DEPENDS geometry_msgs nav_msgs rospy tf
 #  DEPENDS system_lib
 )
 
