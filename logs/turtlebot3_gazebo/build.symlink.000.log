@@ -1,0 +1,4 @@
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/turtlebot3_gazebo/turtlebot3_drive
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/pkgconfig/turtlebot3_gazebo.pc
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_gazebo/cmake/turtlebot3_gazeboConfig-version.cmake
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_gazebo/cmake/turtlebot3_gazeboConfig.cmake

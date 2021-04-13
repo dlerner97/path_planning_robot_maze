@@ -1,0 +1,6 @@
+devel_space: /home/dani/Documents/ENPM661/path_planning_robot_maze/devel
+install: false
+install_space: /home/dani/Documents/ENPM661/path_planning_robot_maze/install
+profile: default
+source_space: /home/dani/Documents/ENPM661/path_planning_robot_maze/src
+workspace: /home/dani/Documents/ENPM661/path_planning_robot_maze

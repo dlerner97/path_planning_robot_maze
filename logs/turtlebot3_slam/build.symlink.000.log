@@ -1,0 +1,4 @@
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/turtlebot3_slam/flat_world_imu_node
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/pkgconfig/turtlebot3_slam.pc
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_slam/cmake/turtlebot3_slamConfig-version.cmake
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_slam/cmake/turtlebot3_slamConfig.cmake

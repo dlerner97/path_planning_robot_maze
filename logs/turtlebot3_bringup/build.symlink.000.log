@@ -1,0 +1,4 @@
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/turtlebot3_bringup/turtlebot3_diagnostics
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/lib/pkgconfig/turtlebot3_bringup.pc
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_bringup/cmake/turtlebot3_bringupConfig-version.cmake
+Symlinking /home/dani/Documents/ENPM661/path_planning_robot_maze/devel/share/turtlebot3_bringup/cmake/turtlebot3_bringupConfig.cmake
