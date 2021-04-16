@@ -45,8 +45,8 @@ class VideoBuffer:
         size = (shape[1], shape[0])
         videowriter = cv2.VideoWriter(video_name + ".avi", cv2.VideoWriter_fourcc(*'DIVX'),self.framerate , size, isColor)
         for f in self.frames:
-            cv2.circle(f, self.start_pos[:2], 5, (0,255,0), -1)
-            cv2.circle(f, self.goal_pos[:2], 5, (0,255,0), -1)
+            cv2.circle(f.astype(np.int32), self.start_pos[:2], 5, (0,255,0), -1)
+            cv2.circle(f.astype(np.int32), self.goal_pos[:2], 5, (0,255,0), -1)
             videowriter.write(f)
         videowriter.release()
  
@@ -212,9 +212,9 @@ class Search(VideoBuffer):
             ang = lambda pos: abs(add_angs(pos[2], -self.goal_pos[2])) <= goal_threshold[1] or abs(add_angs(pos[2], -self.goal_pos[2])) >= 360-goal_threshold[1]
             self.at_goal_pos = lambda pos: math.dist(pos[:2], self.goal_pos[:2]) < goal_threshold_xy and ang(pos)
             
-            # Check if angles meet threshold
-            self.angle_thresh = lambda theta, theta_i: abs(theta-theta_i) > self.angle_threshold and abs(theta-theta_i) <= 360-self.angle_threshold
-         
+        # Check if angles meet threshold
+        self.angle_thresh = lambda theta, theta_i: abs(theta-theta_i) > self.angle_threshold and abs(theta-theta_i) <= 360-self.angle_threshold
+        
         # Append frame
         self.frames.append(self.grid)
         
@@ -428,8 +428,8 @@ class Search(VideoBuffer):
                         path.append(next_set_ind)
                                                    
                         # Change grid color and add frames to video
-                        cv2.circle(self.grid, (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
-                        cv2.circle(self.grid, (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
+                        cv2.circle(self.grid.astype(np.int32), (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
+                        cv2.circle(self.grid.astype(np.int32), (next_set_ind[0], next_set_ind[1]), 2, (0,255,0), -1)
                         self.grid[(next_set_ind[1], next_set_ind[0])] = (0,255,0)
                         self.frames.append(self.grid.copy())
                         
