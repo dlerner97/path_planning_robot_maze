@@ -3,6 +3,7 @@ import os
 import math
 import rospy
 import search
+import numpy as np
 import trial_maps as maps
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
@@ -32,14 +33,14 @@ class ROSIntegration:
         
         orient_msg = msg.pose.pose.orientation
         orient_vec = [orient_msg.x, orient_msg.y, orient_msg.z, orient_msg.w]
-        self.orientation = euler_from_quaternion(orient_vec)
+        self.orientation = np.degrees(list(euler_from_quaternion(orient_vec)))
 
     def find_path(self):
         self.search_algorithm.find_path()
         self.path = self.search_algorithm.path
         self.action_path = self.search_algorithm.action_path
 
-    def move_rt(self, action, way_point, dist_threshold=0.01, speed=.1, angle_threshold=0.5):               
+    def move_rt(self, action, way_point, dist_threshold=0.2, speed=1, angle_threshold=0.5):               
         theta_d = action[1]
         if self.discrete:
             theta_d = math.degrees(math.atan2(action[1], action[0]))
@@ -48,15 +49,19 @@ class ROSIntegration:
         turn_dir = -1
         if turn_angle < -180 or (turn_angle > 0 and turn_angle < 180):
             turn_dir = 1
+            rospy.Rate(.1).sleep()
 
         msg = Twist()
-        print("Turning...")
+        # print("Turning...")
         while not rospy.is_shutdown():
+            print(self.orientation)
             
             turn_angle = theta_d - self.orientation[-1]
             if turn_dir == 1 and self.orientation[-1] >= theta_d - angle_threshold:
+                print("Stop turning!")
                 break
             elif turn_dir == -1 and self.orientation[-1] <= theta_d + angle_threshold:
+                print("Stop turning!")
                 break
 
             msg.angular.z = turn_dir*speed
@@ -64,17 +69,27 @@ class ROSIntegration:
             self.rate.sleep()        
 
         msg = Twist()
-        print("Moving Forward...")
+        # print("Moving Forward...")
         while not rospy.is_shutdown():
-            print(way_point)
-            print(self.position)
+            print(10*"=")
+            print("curr pos:", self.position)
+            print("way_pt:", way_point)
             dist = math.dist(way_point[:2], self.position[:2])
+            print("dist:", dist)
             if dist < dist_threshold:
+                print("At way point...")
                 break
 
             msg.linear.x = speed
             self.pub.publish(msg)
             self.rate.sleep()
+            print(10*"=")
+
+    def move_to_start(self):
+        start_loc = np.array(self.path[0])/10
+        action = (start_loc[0]/10, start_loc[1]/10)
+        self.move_rt(action, start_loc)
+
 
     def publish_path(self, dist_threshold=0.01, cmd_topic='/cmd_vel', pose_topic="/odom", pub_rate=10):
         self.subscriber = rospy.Subscriber(pose_topic, Odometry, callback=self.odom_callback, queue_size=10)
@@ -84,8 +99,11 @@ class ROSIntegration:
         while not self.got_odom:
             self.rate.sleep()
 
+        self.move_to_start()
+
         for way_point, action in zip(self.path[1:], self.action_path[1:]):
-            print("Next way point")
+            way_point = np.array(way_point)/10
+            # print("Next way point")
             self.move_rt(action, way_point)
 
                 
