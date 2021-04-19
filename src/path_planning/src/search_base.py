@@ -5,6 +5,7 @@ import math
 import queue
 import heapq
 import numpy as np
+from roslib.packages import get_pkg_dir
 
 #<=============================== VideoBuffer Class Definition ===================================>#
 class VideoBuffer:
@@ -391,9 +392,10 @@ class Search(VideoBuffer):
                 print(f"\nThe {self.__class__.__name__} algorithm cannot detect a path. Please select new start and goal points or remove obstacles from the grid.")
                
             print("\nSaving Video...")
+            full_path = get_pkg_dir('path_planning') + "/avi_vids/"
             # Save and write video feed
-            self.save(self.__class__.__name__ + '_' + self.video_name + "_animation", True)
-            print(f"The video file can be found in your current directory under {self.__class__.__name__}_{self.video_name}_animation.avi")
+            self.save(full_path + self.__class__.__name__ + '_' + self.video_name + "_animation", True)
+            print(f"The video file can be found in the path_planning package as avi_vids/{self.__class__.__name__}_{self.video_name}_animation.avi")
             print("\n=====================================================================================\n")
 
             # Display grid

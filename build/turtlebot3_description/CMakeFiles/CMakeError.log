@@ -1,21 +1,21 @@
 Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
 Change Dir: /home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_8cd04/fast && /usr/bin/make -f CMakeFiles/cmTC_8cd04.dir/build.make CMakeFiles/cmTC_8cd04.dir/build
+Run Build Command(s):/usr/bin/make cmTC_b0447/fast && /usr/bin/make -f CMakeFiles/cmTC_b0447.dir/build.make CMakeFiles/cmTC_b0447.dir/build
 make[1]: Entering directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_8cd04.dir/src.c.o
-/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_8cd04.dir/src.c.o   -c /home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_8cd04
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_8cd04.dir/link.txt --verbose=1
-/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_8cd04.dir/src.c.o  -o cmTC_8cd04 
-/usr/bin/ld: CMakeFiles/cmTC_8cd04.dir/src.c.o: in function `main':
+Building C object CMakeFiles/cmTC_b0447.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_b0447.dir/src.c.o   -c /home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_b0447
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b0447.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_b0447.dir/src.c.o  -o cmTC_b0447 
+/usr/bin/ld: CMakeFiles/cmTC_b0447.dir/src.c.o: in function `main':
 src.c:(.text+0x46): undefined reference to `pthread_create'
 /usr/bin/ld: src.c:(.text+0x52): undefined reference to `pthread_detach'
 /usr/bin/ld: src.c:(.text+0x63): undefined reference to `pthread_join'
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_8cd04.dir/build.make:87: cmTC_8cd04] Error 1
+make[1]: *** [CMakeFiles/cmTC_b0447.dir/build.make:87: cmTC_b0447] Error 1
 make[1]: Leaving directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp'
-make: *** [Makefile:121: cmTC_8cd04/fast] Error 2
+make: *** [Makefile:121: cmTC_b0447/fast] Error 2
 
 
 Source file was:
@@ -41,18 +41,18 @@ int main(void)
 Determining if the function pthread_create exists in the pthreads failed with the following output:
 Change Dir: /home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_e3b71/fast && /usr/bin/make -f CMakeFiles/cmTC_e3b71.dir/build.make CMakeFiles/cmTC_e3b71.dir/build
+Run Build Command(s):/usr/bin/make cmTC_d4f42/fast && /usr/bin/make -f CMakeFiles/cmTC_d4f42.dir/build.make CMakeFiles/cmTC_d4f42.dir/build
 make[1]: Entering directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_e3b71.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_e3b71.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
-Linking C executable cmTC_e3b71
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e3b71.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_e3b71.dir/CheckFunctionExists.c.o  -o cmTC_e3b71  -lpthreads 
+Building C object CMakeFiles/cmTC_d4f42.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_d4f42.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_d4f42
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d4f42.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_d4f42.dir/CheckFunctionExists.c.o  -o cmTC_d4f42  -lpthreads 
 /usr/bin/ld: cannot find -lpthreads
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_e3b71.dir/build.make:87: cmTC_e3b71] Error 1
+make[1]: *** [CMakeFiles/cmTC_d4f42.dir/build.make:87: cmTC_d4f42] Error 1
 make[1]: Leaving directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description/CMakeFiles/CMakeTmp'
-make: *** [Makefile:121: cmTC_e3b71/fast] Error 2
+make: *** [Makefile:121: cmTC_d4f42/fast] Error 2
 
 
 

@@ -9,7 +9,6 @@
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_teleop:$CMAKE_PREFIX_PATH"
 export LD_LIBRARY_PATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_teleop/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_teleop/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_teleop'
 export PYTHONPATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_teleop/lib/python3/dist-packages:$PYTHONPATH"
 export ROSLISP_PACKAGE_DIRECTORIES="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_teleop/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"

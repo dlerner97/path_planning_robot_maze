@@ -185,7 +185,7 @@ foreach(t ${path_planning_EXPORTED_TARGETS})
   endif()
 endforeach()
 
-set(depends "geometry_msgs;nav_msgs;rospy;tf")
+set(depends "geometry_msgs;nav_msgs;rospy;tf;roslib")
 foreach(depend ${depends})
   string(REPLACE " " ";" depend_list ${depend})
   # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls

@@ -8,8 +8,6 @@
 
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_description:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_description/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_description/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD='/home/dani/Documents/ENPM661/path_planning_robot_maze/build/turtlebot3_description'
 export ROSLISP_PACKAGE_DIRECTORIES="/home/dani/Documents/ENPM661/path_planning_robot_maze/devel/.private/turtlebot3_description/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
 export ROS_PACKAGE_PATH="/home/dani/Documents/ENPM661/path_planning_robot_maze/src/turtlebot3/turtlebot3_description:$ROS_PACKAGE_PATH"

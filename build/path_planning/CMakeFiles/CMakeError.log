@@ -1,21 +1,21 @@
 Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
 Change Dir: /home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_ded8b/fast && /usr/bin/make -f CMakeFiles/cmTC_ded8b.dir/build.make CMakeFiles/cmTC_ded8b.dir/build
+Run Build Command(s):/usr/bin/make cmTC_716e8/fast && /usr/bin/make -f CMakeFiles/cmTC_716e8.dir/build.make CMakeFiles/cmTC_716e8.dir/build
 make[1]: Entering directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_ded8b.dir/src.c.o
-/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_ded8b.dir/src.c.o   -c /home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp/src.c
-Linking C executable cmTC_ded8b
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ded8b.dir/link.txt --verbose=1
-/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_ded8b.dir/src.c.o  -o cmTC_ded8b 
-/usr/bin/ld: CMakeFiles/cmTC_ded8b.dir/src.c.o: in function `main':
+Building C object CMakeFiles/cmTC_716e8.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_716e8.dir/src.c.o   -c /home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_716e8
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_716e8.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_716e8.dir/src.c.o  -o cmTC_716e8 
+/usr/bin/ld: CMakeFiles/cmTC_716e8.dir/src.c.o: in function `main':
 src.c:(.text+0x46): undefined reference to `pthread_create'
 /usr/bin/ld: src.c:(.text+0x52): undefined reference to `pthread_detach'
 /usr/bin/ld: src.c:(.text+0x63): undefined reference to `pthread_join'
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_ded8b.dir/build.make:87: cmTC_ded8b] Error 1
+make[1]: *** [CMakeFiles/cmTC_716e8.dir/build.make:87: cmTC_716e8] Error 1
 make[1]: Leaving directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp'
-make: *** [Makefile:121: cmTC_ded8b/fast] Error 2
+make: *** [Makefile:121: cmTC_716e8/fast] Error 2
 
 
 Source file was:
@@ -41,18 +41,18 @@ int main(void)
 Determining if the function pthread_create exists in the pthreads failed with the following output:
 Change Dir: /home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/make cmTC_4445f/fast && /usr/bin/make -f CMakeFiles/cmTC_4445f.dir/build.make CMakeFiles/cmTC_4445f.dir/build
+Run Build Command(s):/usr/bin/make cmTC_eba63/fast && /usr/bin/make -f CMakeFiles/cmTC_eba63.dir/build.make CMakeFiles/cmTC_eba63.dir/build
 make[1]: Entering directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_4445f.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_4445f.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
-Linking C executable cmTC_4445f
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4445f.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_4445f.dir/CheckFunctionExists.c.o  -o cmTC_4445f  -lpthreads 
+Building C object CMakeFiles/cmTC_eba63.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_eba63.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.16/Modules/CheckFunctionExists.c
+Linking C executable cmTC_eba63
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_eba63.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_eba63.dir/CheckFunctionExists.c.o  -o cmTC_eba63  -lpthreads 
 /usr/bin/ld: cannot find -lpthreads
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_4445f.dir/build.make:87: cmTC_4445f] Error 1
+make[1]: *** [CMakeFiles/cmTC_eba63.dir/build.make:87: cmTC_eba63] Error 1
 make[1]: Leaving directory '/home/dani/Documents/ENPM661/path_planning_robot_maze/build/path_planning/CMakeFiles/CMakeTmp'
-make: *** [Makefile:121: cmTC_4445f/fast] Error 2
+make: *** [Makefile:121: cmTC_eba63/fast] Error 2
 
 
 
