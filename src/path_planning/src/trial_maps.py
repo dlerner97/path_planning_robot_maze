@@ -22,7 +22,18 @@ class TrialMap:
         grid[40-1: 60, 90-1:110] = (0,0,255)                        # Rectangle
         center_circ = (width-1-40, 50-1)
         cv2.circle(grid, center_circ, 15, (0,0,255), -1)            # Circle
-        return "trial_map", grid[::-1,:], height, width        
+
+        map_dict = {
+            "name": "submission_map",
+            "grid": grid[::-1,:],
+            "height": height,
+            "width": width,
+            "map_scaling": 10,
+            "map_def_start": (1, 5),
+            "map_def_goal": (19.8, 5) 
+        }
+            
+        return map_dict        
         
 #<=============================== SubmissionMap Class Definition ===================================>#
 class SubmissionMap:
@@ -88,8 +99,18 @@ class SubmissionMap:
         # bot_mid = [354-1, 138-1]
         # pts = np.array([bot, mid_right, top_right, bot_mid, top_mid, left], np.int32).reshape((-1,1,2))
         # cv2.fillPoly(grid, [pts], (0,0,255))
+
+        map_dict = {
+            "name": "submission_map",
+            "grid": grid[::-1,:],
+            "height": height,
+            "width": width,
+            "map_scaling": 10,
+            "map_def_start": (1, 15),
+            "map_def_goal": (39.8, 15) 
+        }
             
-        return "submission_map", grid[::-1,:], height, width  
+        return map_dict  
       
 #<=============================== TestNoPathMap Class Definition ===================================>#
 class TestNoPathMap:
@@ -111,5 +132,66 @@ class TestNoPathMap:
         
         grid = np.zeros((height,width, 3), np.uint8)                # Initialize shape
         grid[:, 90:100] = (0,0,255)
+
+        map_dict = {
+            "name": "no_path_map",
+            "grid": grid[::-1,:],
+            "height": height,
+            "width": width,
+            "map_scaling": 10,
+            "map_def_start": (1, 5),
+            "map_def_goal": (19.8, 5) 
+        }
         
-        return "no_path_map", grid[::-1,:], height, width
+        return map_dict
+
+#<=============================== GazeboMap Class Definition ===================================>#
+class GazeboMap:
+    
+    """
+    Gazebo Map
+    
+    This class builds the "Gazebo" map and can be passed into the search algorithms as a parameter
+    
+    This class builds an identical map to the competition gazebo map.
+    """
+    
+    # Build grid with red obstacles
+    @staticmethod
+    def gen_grid():
+        scale = 20
+        width = 10*scale
+        height = 10*scale
+        
+        grid = np.zeros((height,width, 3), np.uint8)                # Initialize shape
+        
+        cv2.circle(grid, (2*scale-1,2*scale-1), 1*scale, (0,0,255), -1)
+        cv2.circle(grid, (2*scale-1, height-1-2*scale), 1*scale, (0,0,255), -1)
+
+        int_ = lambda tup0, tup1: (int(round(tup0)), int(round(tup1)))
+        center_sq_left = int_(1*scale, 5*scale)
+        bot_left_corner = int_(center_sq_left[0]-(1.5*scale/2), center_sq_left[1]-(1.5*scale/2))
+        top_right_corner = int_(center_sq_left[0]+(1.5*scale/2), center_sq_left[1]+(1.5*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        center_sq_mid = int_(5*scale, 5*scale)
+        bot_left_corner = int_(center_sq_mid[0]-(2.5*scale/2), center_sq_mid[1]-(1.5*scale/2))
+        top_right_corner = int_(center_sq_mid[0]+(2.5*scale/2), center_sq_mid[1]+(1.5*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        center_sq_right = int_(8*scale, 3*scale)
+        bot_left_corner = int_(center_sq_right[0]-(1.5*scale/2), center_sq_right[1]-(2*scale/2))
+        top_right_corner = int_(center_sq_right[0]+(1.5*scale/2), center_sq_right[1]+(2*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        map_dict = {
+            "name": "gazebo_map",
+            "grid": grid[::-1,:],
+            "height": height,
+            "width": width,
+            "map_scaling": scale,
+            "map_def_start": (1, 1),
+            "map_def_goal": (9, 9) 
+        }
+        
+        return map_dict

@@ -95,8 +95,6 @@ class RobotActionSetGenerator():
                 # User chose correct inputs
                 return val
         
-        
-        
         # Define start/goal positions
         dist = get_user_input("dist", dist_def, dist_bounds)
         print("")
@@ -134,5 +132,55 @@ class RobotActionSetGenerator():
 
     # Differential drive action set
     @staticmethod
-    def gen_robot_diff_drive_action_set():
-        pass
+    def gen_robot_diff_drive_action_set(node_threshold_xy=0.5, node_threshold_theta=30, goal_threshold_xy=1.5, goal_threshold_theta=30):
+        print("\n=====================================================================================\n")
+                
+        # Query user for positions
+        def get_user_input():
+            prompt = f"Enter the two wheel RPM's as left_RPM,right_RPM (0 <= RPM) or leave blank to apply the default value: "
+
+            # Query until user has input legal values     
+            while True:
+                start_str = input(prompt)
+                start_str_nw = start_str.replace(" ", "")
+                
+                # If empty string, set values to default
+                if start_str_nw == '':
+                    print("Selecting default values: ", "50, 100")
+                    return (50, 100)              
+                                    
+                # Check for incorrect input
+                try:
+                    val0 = int(start_str_nw[0])
+                    val1 = int(start_str_nw[1])
+                except:
+                    print("Please type two integers seperated by a comma.\n")
+                    continue    
+                
+                # Check if position out of bounds
+                if val0 < 0 or val1 < 0:
+                    print("Numbers out of bounds. Please select new value.\n")
+                    continue
+
+                # User chose correct inputs
+                return (val0 , val1)
+        
+        # Define user inputs
+        rpm0 = 0
+        rpm1, rpm2 = get_user_input()          
+        print("\n=====================================================================================")
+        
+        # Init dict
+        action_set = {
+            "move_type" : "diff drive",
+            "node_threshold" : (node_threshold_xy, node_threshold_theta),
+            "goal_threshold" : (goal_threshold_xy, goal_threshold_theta),
+            "action_set" : {}
+        }
+        # Apply action set             
+        rpms = [rpm0, rpm1, rpm2]
+        i = 0
+        for rpm_l in rpms:
+            for rpm_r in rpms:
+                action_set["action_set"][i] = {"move": (rpm_l, rpm_r), "cost":0}
+                i += 1

@@ -6,6 +6,12 @@ import queue
 import heapq
 import numpy as np
 from roslib.packages import get_pkg_dir
+import rospy
+
+try:
+    from rospy import get_param
+except:
+    print("ROS is not installed on this computer. Code will only be affected IFF the ROS node is run. If the script is run from main.py, the code should still work.")
 
 #<=============================== VideoBuffer Class Definition ===================================>#
 class VideoBuffer:
@@ -70,9 +76,14 @@ class Search(VideoBuffer):
         print("\n=====================================================================================\n")
         
         # Define map
-        self.video_name, self.grid, self.height, self.width = map_.gen_grid()
-        start_pos_def = (10, self.height//2)
-        goal_pos_def = (self.width-2, self.height//2)
+        map_dict = map_.gen_grid()
+        self.video_name = map_dict["name"]
+        self.grid = map_dict["grid"]
+        self.height = map_dict["height"]
+        self.width = map_dict["width"]
+        self.map_scaling = map_dict["map_scaling"]
+        start_pos_def = map_dict["map_def_start"]
+        goal_pos_def = map_dict["map_def_goal"]
         
         if action_set["move_type"] == "discrete":
             self.discrete = True
@@ -83,7 +94,7 @@ class Search(VideoBuffer):
         def get_pos_user_input(pos_string, default):
             # Query until user has input legal values     
             while True:
-                start_str = f"Enter {pos_string} position as x,y (0 <= x <= {self.width-1} ',' 0 <= y <= {self.height-1}" 
+                start_str = f"Enter {pos_string} position as x,y(,theta) (0 <= x <= {self.width/self.map_scaling - 1} ',' 0 <= y <= {self.height/self.map_scaling-1}" 
                 if not self.discrete:
                     start_str += ", 0 <= theta <= 359"
                 
@@ -93,14 +104,14 @@ class Search(VideoBuffer):
                 # If empty string, set values to default
                 if start_str_nw == '':
                     print("Selecting default values: ", (default[0], default[1], 0))
-                    return (default[0], default[1], 0)              
+                    return (self.map_scaling*default[0], self.height-1-self.map_scaling*default[1], 0)              
                     
                 start_str_list = start_str_nw.split(",")
                 
                 # Check for incorrect input
                 try:
-                    x_pos = int(start_str_list[0])
-                    y_pos = self.height-1-int(start_str_list[1])
+                    x_pos = int(self.map_scaling*start_str_list[0])
+                    y_pos = (self.height-1-int(self.map_scaling*start_str_list[1]))
                     theta = None
                     if not self.discrete:
                         theta = int(start_str_list[2])
@@ -132,7 +143,7 @@ class Search(VideoBuffer):
         def get_user_input(pos_string):                       
             # Query until user has input legal values     
             while True:
-                start_str = input(f"Enter step size distance (0 <= {pos_string}) or leave blank to apply the default values: ")
+                start_str = input(f"Enter robot base {pos_string} (0 <= {pos_string}) or leave blank to apply the default values: ")
                 start_str_nw = start_str.replace(" ", "")
                 
                 # If empty string, set values to default
@@ -156,12 +167,30 @@ class Search(VideoBuffer):
                 return val
         
         # Define start/goal positions
-        self.start_pos = get_pos_user_input("start", start_pos_def)                     # Start position
-        print("")
-        self.goal_pos = get_pos_user_input("goal", goal_pos_def)                        # Goal position
-        print("")
-        self.radius = get_user_input("radius")                                          # Robot radius
-        print("")
+        try: 
+
+            start_pos = get_param("start_pos")
+            print(start_pos)
+            goal_pos = get_param("goal_pos")
+            print(goal_pos)
+            
+            int_ = lambda val: int(round(val))
+            set_up_pos = lambda pos: (int_(self.map_scaling*pos[0]), self.height-1-int_(self.map_scaling*pos[1]), int_(pos[2]))
+            self.start_pos = set_up_pos(start_pos)
+            self.goal_pos = set_up_pos(goal_pos)
+            print(self.start_pos)
+            print(self.goal_pos)
+            self.radius = int_(self.map_scaling*get_param("robot_radius"))
+            print(self.radius)
+            
+        except:
+            print("rosparams not available. Please select start and goal positions from the terminal.\n")
+            self.start_pos = get_pos_user_input("start", start_pos_def)                     # Start position
+            print("")
+            self.goal_pos = get_pos_user_input("goal", goal_pos_def)                        # Goal position
+            print("")
+            self.radius = get_user_input("radius")                                          # Robot radius
+            print("")
         self.clearence = get_user_input("clearence")                                    # Robot clearence
         
         print("\n=====================================================================================")
@@ -176,9 +205,10 @@ class Search(VideoBuffer):
         
         # Display grid
         self.scale_percent = scale_percent
-        Search.show_grid(temp_grid, scale_percent, wait=10000)
+        # Search.show_grid(temp_grid, scale_percent, wait=10000)
+        Search.show_grid(temp_grid, scale_percent, wait=0)
         cv2.destroyAllWindows()
-        scale = 1
+        self.scale = 1
         
         # Define variables
         
@@ -202,18 +232,18 @@ class Search(VideoBuffer):
             
             # Scale grid to account for xy distance threshold
             node_threshold = action_set["node_threshold"]
-            scale = 1/node_threshold[0]
-            self.grid = self.resize_image(self.grid, 100*scale)
-            self.goal_pos = (int(scale*self.goal_pos[0]), int(scale*self.goal_pos[1]), self.goal_pos[2])
-            self.start_pos = (int(scale*self.start_pos[0]), int(scale*self.start_pos[1]), self.start_pos[2]) 
+            self.scale = 1/node_threshold[0]
+            self.grid = self.resize_image(self.grid, 100*self.scale)
+            self.goal_pos = (int(self.scale*self.goal_pos[0]), int(self.scale*self.goal_pos[1]), self.goal_pos[2])
+            self.start_pos = (int(self.scale*self.start_pos[0]), int(self.scale*self.start_pos[1]), self.start_pos[2]) 
             self.scale_percent *= node_threshold[0]
             self.angle_threshold = node_threshold[1]
-            self.width *= scale
-            self.height *= scale
+            self.width *= self.scale
+            self.height *= self.scale
             
             # Check if at goal position
             goal_threshold = action_set['goal_threshold']
-            goal_threshold_xy = scale*goal_threshold[0]
+            goal_threshold_xy = self.scale*goal_threshold[0]
             ang = lambda pos: abs(add_angs(pos[2], -self.goal_pos[2])) <= goal_threshold[1] or abs(add_angs(pos[2], -self.goal_pos[2])) >= 360-goal_threshold[1]
             self.at_goal_pos = lambda pos: math.dist(pos[:2], self.goal_pos[:2]) < goal_threshold_xy and ang(pos)
         
@@ -249,8 +279,8 @@ class Search(VideoBuffer):
         # Other 
         self.add_frame_frequency = round(add_frame_frequency/8)        
         self.uint8_0 = np.uint8(0)                                                       # Define a 0 as an 8-bit unsigned int. This will save processing time    
-        self.radius *= scale
-        self.clearence *= scale 
+        self.radius *= self.scale
+        self.clearence *= self.scale 
         self.action_set = action_set["action_set"]
                       
     # Convert position tuple into string for dictionary storage
@@ -369,14 +399,16 @@ class Search(VideoBuffer):
 
                 # Print full move set
                 path.reverse()
-                self.path = np.asarray(path)
+                map_scale = lambda val: round(val/self.map_scaling, 1)
+                path = map(lambda path_i: (map_scale(path_i[0]/self.scale), map_scale((self.height-1-path_i[1])/self.scale), path_i[2]), path)
+                self.path = np.asarray(list(path))
 
                 action_path.append((0,0))
                 action_path.reverse()
                 self.action_path = action_path
 
                 # self.grid = self.grid.get()
-                self.grid[self.path[:, 1], self.path[:, 0]] = (0,255,0)
+                # self.grid[self.path[:, 1], self.path[:, 0]] = (0,255,0)
                 
                 # Calculate time elapsed
                 time_elapsed_s = time.time() - start_time
