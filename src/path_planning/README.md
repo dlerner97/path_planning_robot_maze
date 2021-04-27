@@ -61,7 +61,16 @@ Make sure the proper setup.bash is sourced then run
 ```bash
 roslaunch turtlebot3_gazebo turtlebot3_map_661.launch
 ```
+
 This will automatically run both gazebo and the node. Please note that each action set in the main script can also be used here as well but only the gazebo map has a corresponding gazebo interface.
+
+Further note that there are many customizable ros params that can be selected from the the launch call. Type the above roslaunch command, add a space, then double tap the "TAB" key to see all parameters. To select non-default parameters such as the starting location of the turtlebot, type:
+
+```bash
+roslaunch turtlebot3_gazebo turtlebot3_map_661.launch start_x_pos:=1 start_y_pos:=1 start_yaw:=90 
+```
+
+and both the launch file and python search file should update accordingly (through ROS parameters)
 
 The search will prompt the user for certain attributes and others can be defined in the main function.
 
