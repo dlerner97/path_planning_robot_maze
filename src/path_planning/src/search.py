@@ -74,7 +74,7 @@ class BFSSearch(Search):
         for branch_info in self.action_set.values(): 
             # Get the new position using tuple addition
             pos = self.get_next_pos(parent, branch_info['move'])
-            found_goal = self._get_next_branch(parent, pos, action) or found_goal
+            found_goal = self._get_next_branch(parent, pos, branch_info['move']) or found_goal
         
         # If any of these are true, we have reached the goal state. Propogate the true to the next level
         return found_goal
@@ -186,8 +186,9 @@ class AStarSearch(Search):
     Executes a A* search on the given map with the given action set.
     """    
     
-    def __init__(self, map, action_set, scale_percent=100, add_frame_frequency=100, framerate=100):
+    def __init__(self, map, action_set, cost_to_follow_weight=1, scale_percent=100, add_frame_frequency=100, framerate=100):
         super().__init__(map, action_set, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
+        self.weight = cost_to_follow_weight
 
     # Grabs next node
     def _get_next_branch(self, parent, pos, action, branch_cost): 
@@ -217,7 +218,7 @@ class AStarSearch(Search):
                 return False
                     
             cost_from_first = parent_cost+branch_cost
-            total_cost = cost_from_first + math.sqrt((self.goal_pos[0]-pos[0])**2 + (self.goal_pos[1]-pos[1])**2)
+            total_cost = cost_from_first + self.weight*math.sqrt((self.goal_pos[0]-pos[0])**2 + (self.goal_pos[1]-pos[1])**2)
             node_info = self.node_info.get(loc_string, None)
             
             # If position corresponds to the winning state, return True
@@ -247,7 +248,7 @@ class AStarSearch(Search):
                 # Replace parent node if smaller cost path can be found
                 keys = list(node_info.keys())
                 closest_theta = keys[np.argmin([not self.angle_thresh(theta, theta_i) for theta_i in keys])]
-                if cost_from_first < node_info[closest_theta]["cost_from_first"]:
+                if cost_from_first < node_info[closest_theta]["cost_from_first"] and parent != pos:
                     self.node_info[loc_string].pop(closest_theta)
                     self.node_info[loc_string][theta] = {"parent": parent, "action": action, "cost_from_first": cost_from_first}
                     
@@ -257,9 +258,17 @@ class AStarSearch(Search):
         # Check all directions
         found_goal = False
         for branch_info in self.action_set.values():            
+            # print("==============")
+            # print("parent", parent)
+            # print("move", branch_info['move'])
             pos = self.get_next_pos(parent[1], branch_info['move'])
             found_goal = self._get_next_branch(parent, pos, branch_info['move'], branch_info['cost']) or found_goal
+        #     print("pos", pos)
+        #     print("==============")
+        #     self.show_grid(self.grid, wait=1)
+        # print("grid shape", self.grid.shape)
         
+        # exit()
         # If any of these are true, we have reached the goal state. Propogate the true to the next level
         return found_goal
     

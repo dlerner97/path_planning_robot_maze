@@ -146,8 +146,11 @@ class RobotActionSetGenerator():
                 
                 # If empty string, set values to default
                 if start_str_nw == '':
-                    print("Selecting default values: ", "50, 100")
-                    return (50, 100)              
+                    def_vals = (5, 10)
+                    # def_vals = (45, 50)
+                    # def_vals = (50, 100)
+                    print("Selecting default values: ", f"{def_vals[0]}, {def_vals[1]}")
+                    return def_vals             
                                     
                 # Check for incorrect input
                 try:
@@ -177,10 +180,12 @@ class RobotActionSetGenerator():
             "goal_threshold" : (goal_threshold_xy, goal_threshold_theta),
             "action_set" : {}
         }
-        # Apply action set             
+        # Apply action set 
         rpms = [rpm0, rpm1, rpm2]
+
         i = 0
         for rpm_l in rpms:
             for rpm_r in rpms:
                 action_set["action_set"][i] = {"move": (rpm_l, rpm_r), "cost":0}
                 i += 1
+        return action_set

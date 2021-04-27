@@ -24,13 +24,14 @@ class TrialMap:
         cv2.circle(grid, center_circ, 15, (0,0,255), -1)            # Circle
 
         map_dict = {
-            "name": "submission_map",
+            "name": "trial_map",
             "grid": grid[::-1,:],
             "height": height,
             "width": width,
-            "map_scaling": 10,
-            "map_def_start": (1, 5),
-            "map_def_goal": (19.8, 5) 
+            "map_scaling": 1,
+            "map_def_start": (10, 50),
+            "map_def_goal": (198, 50),
+            "robot_scale": 10 
         }
             
         return map_dict        
@@ -106,8 +107,9 @@ class SubmissionMap:
             "height": height,
             "width": width,
             "map_scaling": 10,
-            "map_def_start": (1, 15),
-            "map_def_goal": (39.8, 15) 
+            "map_def_start": (10, 150),
+            "map_def_goal": (398, 150),
+            "robot_scale": 10 
         }
             
         return map_dict  
@@ -138,9 +140,10 @@ class TestNoPathMap:
             "grid": grid[::-1,:],
             "height": height,
             "width": width,
-            "map_scaling": 10,
-            "map_def_start": (1, 5),
-            "map_def_goal": (19.8, 5) 
+            "map_scaling": 100,
+            "map_def_start": (10, 50),
+            "map_def_goal": (198, 50),
+            "robot_scale": 10  
         }
         
         return map_dict
@@ -190,8 +193,9 @@ class GazeboMap:
             "height": height,
             "width": width,
             "map_scaling": scale,
-            "map_def_start": (1, 1),
-            "map_def_goal": (9, 9) 
+            "map_def_start": (6, 8),
+            "map_def_goal": (9, 9),
+            "robot_scale": 1 
         }
         
         return map_dict

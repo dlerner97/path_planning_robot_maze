@@ -8,25 +8,32 @@ from action_generator import RobotActionSetGenerator
 
 #<=============================== Main ===================================>#
 if __name__ == '__main__':
-    os.system('cls')
+    os.system('clear')
 
     # Action set for discrete moves
-    action_set = RobotActionSetGenerator.gen_robot_discrete_action_set(
-        diagnol = True,
-        move_amt = 1
-    )
+    # action_set = RobotActionSetGenerator.gen_robot_discrete_action_set(
+    #     diagnol = True,
+    #     move_amt = 1
+    # )
     
-    #  Action set for turning robots
-    action_set = RobotActionSetGenerator.gen_robot_rt_action_set(
+    # #  Action set for turning robots
+    # action_set = RobotActionSetGenerator.gen_robot_rt_action_set(
+    #     node_threshold_xy = 0.5,                                    # Euclidean distance threshold for considering two nodes having the same pos
+    #     node_threshold_theta = 30,                                  # Threshold for considering two nodes having the same angle
+    #     goal_threshold_xy = 1.5,                                    # Euclidean distance threshold for node being close enough to goal pos
+    #     goal_threshold_theta = 30,                                  # Angle threshold for node being close enough to goal angle
+    #     max_add_turn_cost = 0                                       # Added cost for maximum turn. Intermediate turns will have proportional costs between the propulsion radius, d <= turn_cost <= d + max_add_turn_cost  
+    # )
+    
+    action_set = RobotActionSetGenerator.gen_robot_diff_drive_action_set(
         node_threshold_xy = 0.5,                                    # Euclidean distance threshold for considering two nodes having the same pos
         node_threshold_theta = 30,                                  # Threshold for considering two nodes having the same angle
         goal_threshold_xy = 1.5,                                    # Euclidean distance threshold for node being close enough to goal pos
-        goal_threshold_theta = 30,                                  # Angle threshold for node being close enough to goal angle
-        max_add_turn_cost = 0                                       # Added cost for maximum turn. Intermediate turns will have proportional costs between the propulsion radius, d <= turn_cost <= d + max_add_turn_cost  
+        goal_threshold_theta = 30                                   # Angle threshold for node being close enough to goal angle
     )
-    
+
     # A* Searches
-    trial_map = search.AStarSearch(maps.TrialMap, action_set, scale_percent=300,add_frame_frequency=50, framerate=100)
+    trial_map = search.AStarSearch(maps.TrialMap, action_set, cost_to_follow_weight=1.1, scale_percent=600,add_frame_frequency=50, framerate=100)
     trial_map.find_path()
     
     # cv2.destroyAllWindows()
