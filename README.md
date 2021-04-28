@@ -1,4 +1,4 @@
-# proj2_dani_lerner
+# proj3_dani_lerner
 
 ## Dependencies
 
@@ -16,11 +16,23 @@ The following packages must be installed to run this code:
 All libraries are standard python libraries (other than opencv).  
 Please further note that the "main.py" python script imports the other scripts. Therefore, they must be kept in the same directory.
 
-To run the code, change the directory to proj2_dani_lerner folder. i.e.
+To run the code, change the directory to path_planning folder i.e.
 
 ```bash
-cd your_path/proj2_dani_lerner
+cd your_path/path_planning_robot_maze/src/path_planning
 ```
+
+OR
+
+```bash
+source your_path/path_planning_robot_maze/devel/setup.bash
+roscd path_planning
+```
+
+For use with ROS, please use the second method since it will be needed later on regardless.
+
+There are two ways to run the code.
+1. main.py
 
 To run a given test case, merely go into main.py and comment out everything but the given test case initialization and find_path function. All search algorithms can be used with both types of action sets and all created maps. There are 3 maps: TestMap (relatively simple map), SubmissionMap (more complicated map), and TestNoPathMap (no possible path between start and goal locations). 
 Furthermore, there are two types of action sets:
@@ -41,6 +53,24 @@ To run the main, type ...
 ```bash
 python main.py
 ```
+
+2. path_planning_node.py
+
+Make sure the proper setup.bash is sourced then run
+
+```bash
+roslaunch turtlebot3_gazebo turtlebot3_map_661.launch
+```
+
+This will automatically run both gazebo and the node. Please note that each action set in the main script can also be used here as well but only the gazebo map has a corresponding gazebo interface.
+
+Further note that there are many customizable ros params that can be selected from the the launch call. Type the above roslaunch command, add a space, then double tap the "TAB" key to see all parameters. To select non-default parameters such as the starting location of the turtlebot, type:
+
+```bash
+roslaunch turtlebot3_gazebo turtlebot3_map_661.launch start_x_pos:=1 start_y_pos:=1 start_yaw:=90 
+```
+
+and both the launch file and python search file should update accordingly (through ROS parameters)
 
 The search will prompt the user for certain attributes and others can be defined in the main function.
 
