@@ -1,4 +1,4 @@
-# proj2_dani_lerner
+# proj3_dani_lerner
 
 ## Dependencies
 
