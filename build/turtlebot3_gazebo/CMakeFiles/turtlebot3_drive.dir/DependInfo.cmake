@@ -30,14 +30,14 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/home/dani/Documents/ENPM661/path_planning_robot_maze/src/turtlebot3_simulations/turtlebot3_gazebo/include"
-  "/opt/ros/noetic/include"
   "/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
   "/usr/include/gazebo-11"
   "/usr/include/bullet"
-  "/usr/include/sdformat-9.4"
+  "/usr/include/sdformat-9.5"
   "/usr/include/OGRE"
   "/usr/include/OGRE/Terrain"
   "/usr/include/OGRE/Paging"
+  "/opt/ros/noetic/include"
   "/usr/include/simbody"
   "/usr/include/ignition/math6"
   "/usr/include/ignition/transport8"
@@ -45,7 +45,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/include/ignition/common3"
   "/usr/include/ignition/fuel_tools4"
   "/usr/include/eigen3"
-  "/usr/include/sdformat-9.4/sdf/.."
+  "/usr/include/sdformat-9.5/sdf/.."
   "/usr/include/ignition/cmake2"
   "/usr/include/uuid"
   )
