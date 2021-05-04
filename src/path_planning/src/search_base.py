@@ -1,14 +1,11 @@
 #<=============================== Imports ===================================>#
-from os import close
 import cv2
 import time
 import math
 import queue
 import heapq
 import numpy as np
-from numpy.lib.function_base import diff
 from roslib.packages import get_pkg_dir
-import rospy
 
 try:
     from rospy import get_param
