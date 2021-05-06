@@ -74,9 +74,10 @@ class Search(VideoBuffer):
     """
 
     # Takes in video_name, default start/goal positions, output feed scale factor, number of nodes between subsequent frames, video framerate
-    def __init__(self, map_, action_set, cost_algorithm=False, scale_percent=100, add_frame_frequency=100, framerate = 100):
+    def __init__(self, map_, action_set, cost_algorithm=False, scale_percent=100, add_frame_frequency=100, framerate = 100, save_video=True):
         # Init VideoBuffer Parent
         super().__init__(framerate=framerate, scale_percent=scale_percent)
+        self.save_video = save_video
         self.int_ = lambda val: int(round(val))
         print("\n=====================================================================================\n")
         
@@ -504,16 +505,18 @@ class Search(VideoBuffer):
             else:
                 print(f"\nThe {self.__class__.__name__} algorithm cannot detect a path. Please select new start and goal points or remove obstacles from the grid.")
                
-            print("\nSaving Video...")
             full_path = get_pkg_dir('path_planning') + "/avi_vids/"
             # Save and write video feed
-            self.save(full_path + self.__class__.__name__ + '_' + self.video_name + "_animation", True)
-            print(f"The video file can be found in the path_planning package as avi_vids/{self.__class__.__name__}_{self.video_name}_animation.avi")
-            print("\n=====================================================================================\n")
+            if self.save_video:
+                print("\nSaving Video...")
+                self.save(full_path + self.__class__.__name__ + '_' + self.video_name + "_animation", True)
+                print(f"The video file can be found in the path_planning package as avi_vids/{self.__class__.__name__}_{self.video_name}_animation.avi")
+                print("\n=====================================================================================\n")
 
             # Display grid
             Search.show_grid(self.grid, self.scale_percent, wait=10000)   
                
         except KeyboardInterrupt:
-            print("Keyboard Interrupt")
-            self.save(self.video_name + "_animation_INTERRUPT", True)
+            if self.save_video:
+                print("Keyboard Interrupt")
+                self.save(self.video_name + "_animation_INTERRUPT", True)

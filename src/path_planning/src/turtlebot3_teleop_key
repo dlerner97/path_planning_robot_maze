@@ -60,8 +60,6 @@ space key, s : force stop
 q : quits program execution
 e : manually starts and stops automation
 z : breaks from all angular motion. Continues linear motion
-
-CTRL-C to quit
 """
 
 e = """
@@ -178,6 +176,10 @@ if __name__=="__main__":
                 break
 
             if rospy.get_param("automate_movement"):
+                target_linear_vel   = 0.0
+                control_linear_vel  = 0.0
+                target_angular_vel  = 0.0
+                control_angular_vel = 0.0
                 continue
 
             if key == 'w' :

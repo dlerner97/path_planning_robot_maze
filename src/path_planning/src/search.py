@@ -15,8 +15,8 @@ class BFSSearch(Search):
     Executes a breadth first searchon the given map with the given action set.
     """
     
-    def __init__(self, map, action_set, scale_percent=100, add_frame_frequency=100, framerate=100):
-        super().__init__(map, action_set, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
+    def __init__(self, map, action_set, scale_percent=100, add_frame_frequency=100, framerate=100, save_video=True):
+        super().__init__(map, action_set, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate, save_video=save_video)
 
     # Grabs next node
     def _get_next_branch(self, parent, pos, action): 
@@ -95,8 +95,8 @@ class DijkstraSearch(Search):
     Executes a djikstra search on the given map with the given action set.
     """
     
-    def __init__(self, map, action_set, scale_percent=100, add_frame_frequency=100, framerate=100):
-        super().__init__(map, action_set, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
+    def __init__(self, map, action_set, scale_percent=100, add_frame_frequency=100, framerate=100, save_video=True):
+        super().__init__(map, action_set, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate, save_video=save_video)
 
     # Grabs next node
     def _get_next_branch(self, parent, pos, action, branch_cost): 
@@ -186,8 +186,8 @@ class AStarSearch(Search):
     Executes a A* search on the given map with the given action set.
     """    
     
-    def __init__(self, map, action_set, cost_to_follow_weight=1, scale_percent=100, add_frame_frequency=100, framerate=100):
-        super().__init__(map, action_set, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate)
+    def __init__(self, map, action_set, cost_to_follow_weight=1, scale_percent=100, add_frame_frequency=100, framerate=100, save_video=True):
+        super().__init__(map, action_set, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate, save_video=save_video)
         self.weight = cost_to_follow_weight
 
     # Grabs next node
