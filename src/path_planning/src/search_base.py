@@ -43,8 +43,11 @@ class VideoBuffer:
       
     # Displays grid at a given scale
     @staticmethod
-    def show_grid(grid, scale_percent=100, wait=0):    
-        resized = VideoBuffer.resize_image(grid, scale_percent) 
+    def show_grid(grid, scale_percent=100, wait=0, start_pos=None, goal_pos=None):    
+        resized = VideoBuffer.resize_image(grid, scale_percent)
+        if start_pos is not None: 
+            cv2.circle(resized, start_pos[:2], 5, (0,255,0), -1)
+            cv2.circle(resized, goal_pos[:2], 5, (0,255,0), -1)
         cv2.imshow("grid",resized)
         k = cv2.waitKey(wait) & 0xff
         if k == ord('q'):
@@ -261,15 +264,7 @@ class Search(VideoBuffer):
                     while t < 1:
                         t += dt
                         x_s = x_n
-                        y_s = y_n
-
-                        # print("-----")
-                        # print("change", change)
-                        # print("theta_n", theta_n)
-                        # print("x_n add:", 0.5*self.wheel_radius*(change[0]+change[1])*cos(theta_n)*dt) 
-                        # print("y_n add:", 0.5*self.wheel_radius*(change[0]+change[1])*sin(theta_n)*dt)
-                        # print("theta_n add:", math.degrees((self.wheel_radius/self.robot_width)*(change[1]-change[0])*dt))
-                         
+                        y_s = y_n                        
                         x_n += 0.5*self.wheel_radius*(change[0]+change[1])*cos(theta_n)*dt
                         y_n += 0.5*self.wheel_radius*(change[0]+change[1])*sin(theta_n)*dt
                         theta_n = int(round(add_angs(theta_n, math.degrees((self.wheel_radius/self.robot_width)*(change[1]-change[0])*dt))))
@@ -412,6 +407,7 @@ class Search(VideoBuffer):
             while (not solution_found):
 
                 # Pull state from queue and check subsequent nodes
+                parent = None
                 try:
                     parent = self.q_get()
                 except IndexError:

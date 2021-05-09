@@ -29,12 +29,16 @@ if __name__ == '__main__':
         node_threshold_xy = 0.5,                                    # Euclidean distance threshold for considering two nodes having the same pos
         node_threshold_theta = 30,                                  # Threshold for considering two nodes having the same angle
         goal_threshold_xy = 1.5,                                    # Euclidean distance threshold for node being close enough to goal pos
-        goal_threshold_theta = 30                                   # Angle threshold for node being close enough to goal angle
+        goal_threshold_theta = 360                                  # Angle threshold for node being close enough to goal angle
     )
 
-    # A* Searches
-    trial_map = search.AStarSearch(maps.TrialMap, action_set, cost_to_follow_weight=1.1, scale_percent=600,add_frame_frequency=50, framerate=100)
+    # RRT* Searches
+    trial_map = search.RRTStarSearch(maps.TrialMap, action_set, max_iters=5000, check_cost_radius=40, scale_percent=600, add_frame_frequency=50, framerate=100)
     trial_map.find_path()
+    
+    # A* Searches
+    # trial_map = search.AStarSearch(maps.TrialMap, action_set, cost_to_follow_weight=1.1, scale_percent=600,add_frame_frequency=50, framerate=100)
+    # trial_map.find_path()
     
     # cv2.destroyAllWindows()
 
