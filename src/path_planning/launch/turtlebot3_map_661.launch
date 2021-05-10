@@ -1,8 +1,13 @@
 <launch>
   <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
-  <arg name="start_x_pos" default="0.5"/>
-  <arg name="start_y_pos" default="0.5"/>
-  <arg name="start_yaw" default="0.0"/>
+  <rosparam param="model" subst_value="True">$(arg model)</rosparam>
+
+  <arg name="automate_movement" default="False"/>
+  <rosparam param="automate_movement" subst_value="True">$(arg automate_movement)</rosparam> 
+
+  <arg name="start_x_pos" default="1.0"/>
+  <arg name="start_y_pos" default="1.0"/>
+  <arg name="start_yaw" default="$(eval 3.14159/2)"/> 
   <rosparam param="start_pos" subst_value="True">[$(arg start_x_pos), $(arg start_y_pos), $(arg start_yaw)]</rosparam>
 
   <arg name="robot_radius" default="0.105"/>
@@ -21,13 +26,13 @@
   <arg name="origin_offset_y" default="5.0"/>
   <rosparam param="origin_offset" subst_value="True">[$(arg origin_offset_x), $(arg origin_offset_y)]</rosparam>
 
-  <arg name="goal_x_pos" default="9.0"/>
-  <arg name="goal_y_pos" default="9.0"/>
+  <arg name="goal_x_pos" default="5.0"/>
+  <arg name="goal_y_pos" default="8.0"/>
   <arg name="goal_yaw" default="0.0"/>
   <rosparam param="goal_pos" subst_value="True">[$(arg goal_x_pos), $(arg goal_y_pos), $(arg goal_yaw)]</rosparam>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/map.world"/>
+    <arg name="world_name" value="$(find path_planning)/worlds/course.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
@@ -40,7 +45,7 @@
 
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
 
-  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-urdf -model turtlebot3_$(arg model) -x $(arg abs_start_x_pos) -y $(arg abs_start_y_pos) -Y $(arg start_yaw) -param robot_description" />
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf" args="-urdf -model turtlebot3_$(arg model) -x $(arg abs_start_x_pos) -y $(arg abs_start_y_pos) -z 3.0 -Y $(arg start_yaw) -param robot_description" />
 
   <node pkg="path_planning" type="path_planning_node.py" name="path_planning_node" output="screen"/>
 </launch>
