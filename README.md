@@ -1,4 +1,4 @@
-# proj3_dani_lerner
+# Final Project
 
 ## Dependencies
 
@@ -59,15 +59,15 @@ python main.py
 Make sure the proper setup.bash is sourced then run
 
 ```bash
-roslaunch turtlebot3_gazebo turtlebot3_map_661.launch
+roslaunch path_planning turtlebot3_map_661.launch
 ```
 
-This will automatically run both gazebo and the node. Please note that each action set in the main script can also be used here as well but only the gazebo map has a corresponding gazebo interface.
+This will automatically run both gazebo and the automation node. Please note that each action set in the main script can also be used here as well but only the gazebo map has a corresponding gazebo interface.
 
 Further note that there are many customizable ros params that can be selected from the the launch call. Type the above roslaunch command, add a space, then double tap the "TAB" key to see all parameters. To select non-default parameters such as the starting location of the turtlebot, type:
 
 ```bash
-roslaunch turtlebot3_gazebo turtlebot3_map_661.launch start_x_pos:=1 start_y_pos:=1 start_yaw:=90 
+roslaunch path_planning turtlebot3_map_661.launch start_x_pos:=1 start_y_pos:=1 start_yaw:=90 
 ```
 
 and both the launch file and python search file should update accordingly (through ROS parameters)
@@ -75,6 +75,14 @@ and both the launch file and python search file should update accordingly (throu
 The search will prompt the user for certain attributes and others can be defined in the main function.
 
 Please follow all terminal instructions once the program starts.
+
+To run the manual mode, first wait for a prompt that says "User can start driving." Then, open a new terminal, source the package and run
+
+```bash
+rosrun path_planning turtlebot3_teleop_key
+```
+
+Follow the command prompt instructions to move turtlebot.
 
 Videos can be found in this playlist:
 https://www.youtube.com/watch?v=Rhwp2Mofshw&list=PLoQLXWMjdIjRBjriZcNAFHTQGuJDQBsIJ&index=1&ab_channel=DaniLerner
