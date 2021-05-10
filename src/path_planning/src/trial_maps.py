@@ -199,3 +199,89 @@ class GazeboMap:
         }
         
         return map_dict
+
+#<=============================== GazeboMap Class Definition ===================================>#
+class GazeboCourseMap:
+    
+    """
+    Gazebo Course Map
+    
+    This class builds the "Gazebo Course" map and can be passed into the search algorithms as a parameter
+    
+    This class builds an identical map to the 'course' gazebo map.
+    """
+    
+    # Build grid with red obstacles
+    @staticmethod
+    def gen_grid():
+        scale = 10
+        width = 10*scale
+        height = 10*scale
+        
+        grid = np.zeros((height,width, 3), np.uint8)                # Initialize shape
+        int_ = lambda tup0, tup1: (int(round(tup0)), int(round(tup1)))
+
+        cv2.circle(grid, (height//2, width//2), int(1.1*scale), (0,0,255), -1)
+
+        center_7 = int_((5-2.5)*scale, (5-3.0)*scale)
+        bot_left_corner = int_(center_7[0]-(1.0*scale/2), center_7[1]-(1.0*scale/2))
+        top_right_corner = int_(center_7[0]+(1.0*scale/2), center_7[1]+(1.0*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        bot_table = int_((5-0.4)*scale, (5-2.0)*scale)
+        bot_left_corner = int_(bot_table[0]-(1.0*scale/2), bot_table[1]-(1.0*scale/2))
+        top_right_corner = int_(bot_table[0]+(1.0*scale/2), bot_table[1]+(1.0*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        bot_shelf = int_((5+2.5)*scale, (5-3.0)*scale)
+        bot_left_corner = int_(bot_shelf[0]-(1.2*scale/2), bot_shelf[1]-(0.8*scale/2))
+        top_right_corner = int_(bot_shelf[0]+(1.2*scale/2), bot_shelf[1]+(0.8*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        center_1 = int_((5+2.0)*scale, (5-0.3)*scale)
+        bot_left_corner = int_(center_1[0]-(1.0*scale/2), center_1[1]-(1.0*scale/2))
+        top_right_corner = int_(center_1[0]+(1.0*scale/2), center_1[1]+(1.0*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        left_shelf = int_((5-4.0)*scale, (5-0)*scale)
+        bot_left_corner = int_(left_shelf[0]-(0.8*scale/2), left_shelf[1]-(1.2*scale/2))
+        top_right_corner = int_(left_shelf[0]+(0.8*scale/2), left_shelf[1]+(1.2*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        top_shelf = int_((5-3.0)*scale, (5+4.5)*scale)
+        bot_left_corner = int_(top_shelf[0]-(1.2*scale/2), top_shelf[1]-(0.8*scale/2))
+        top_right_corner = int_(top_shelf[0]+(1.2*scale/2), top_shelf[1]+(0.8*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        top_table = int_((5+2.0)*scale, (5+2.0)*scale)
+        bot_left_corner = int_(top_table[0]-(1.0*scale/2), top_table[1]-(1.0*scale/2))
+        top_right_corner = int_(top_table[0]+(1.0*scale/2), top_table[1]+(1.0*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        person = int_((5-2.5)*scale, (5+2.5)*scale)
+        bot_left_corner = int_(person[0]-(0.5*scale/2), person[1]-(0.2*scale/2))
+        top_right_corner = int_(person[0]+(0.5*scale/2), person[1]+(0.2*scale/2))
+        cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        # center_sq_mid = int_(5*scale, 5*scale)
+        # bot_left_corner = int_(center_sq_mid[0]-(2.5*scale/2), center_sq_mid[1]-(1.5*scale/2))
+        # top_right_corner = int_(center_sq_mid[0]+(2.5*scale/2), center_sq_mid[1]+(1.5*scale/2))
+        # cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        # center_sq_right = int_(8*scale, 3*scale)
+        # bot_left_corner = int_(center_sq_right[0]-(1.5*scale/2), center_sq_right[1]-(2*scale/2))
+        # top_right_corner = int_(center_sq_right[0]+(1.5*scale/2), center_sq_right[1]+(2*scale/2))
+        # cv2.rectangle(grid, bot_left_corner, top_right_corner, (0,0,255), -1)
+
+        map_dict = {
+            "name": "course_map",
+            "grid": grid[::-1,:],
+            "height": height,
+            "width": width,
+            "map_scaling": scale,
+            "map_def_start": (1, 1),
+            "map_def_goal": (9, 9),
+            "robot_scale": 1 
+        }
+        
+        return map_dict

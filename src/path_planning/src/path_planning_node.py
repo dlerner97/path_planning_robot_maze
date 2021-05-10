@@ -28,7 +28,7 @@ class ROSIntegration:
     def __init__(self, search_type, map, action_set, scale_percent=100, add_frame_frequency=100, framerate=100) -> None:
         
         # Initialize search
-        self.search_algorithm = search_type(map, action_set, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate, save_video=False)
+        self.search_algorithm = search_type(map, action_set, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate, save_video=True)
         self.got_odom = False
 
         # Initialize action set
@@ -53,6 +53,8 @@ class ROSIntegration:
             origin_offset = (5,5)
 
         self.origin_offset = (int_(origin_offset[0]), int_(origin_offset[1]))
+
+        # Max speeds
         BURGER_MAX_LIN_VEL = 0.22
         BURGER_MAX_ANG_VEL = 2.84
 
@@ -85,6 +87,7 @@ class ROSIntegration:
         self.action_path = self.search_algorithm.action_path
         self.grid = self.search_algorithm.grid
 
+    # Prevent high speeds for lin and ang vel
     def saturate_output(self, lin_vel, ang_vel):
         if lin_vel > self.max_lin_vel:
             lin_vel = self.max_lin_vel
@@ -169,6 +172,7 @@ class ROSIntegration:
         while not rospy.is_shutdown():
             dist = (math.dist(way_point[:2], self.position[:2]), math.degrees(math.atan2(way_point[1]-self.position[1], way_point[0]-self.position[0])))
            
+            # Switch back to manual driving
             if dist[0] < automate_threshold:
                 rospy.loginfo("Switching to manual driving...")
                 msg.linear.x = 0
@@ -177,6 +181,7 @@ class ROSIntegration:
                 rospy.set_param("automate_movement", False)
                 return False
 
+            # At way point
             if dist[0] < dist_threshold:
                 rospy.loginfo("At way point")
                 break
@@ -187,8 +192,9 @@ class ROSIntegration:
             if turn_angle < -180 or (turn_angle > 0 and turn_angle < 180):
                 turn_dir = 1
 
-            lin_vel = k_lin*dist[0]
-            ang_vel = turn_dir*k_ang*abs(dist[1]-self.orientation[-1])
+            # Define and publish message
+            lin_vel = k_lin*dist[0]                                             # Closed loop P-Control
+            ang_vel = turn_dir*k_ang*abs(dist[1]-self.orientation[-1])          # Closed loop P-Control
             msg.linear.x, msg.angular.z = self.saturate_output(lin_vel, ang_vel)
 
             if count >= 10:
@@ -248,15 +254,17 @@ class ROSIntegration:
         cv2.destroyAllWindows()
 
     # Publishes path in closed loop controller to turtlebot
-    def conditional_publish_path(self, automate_threshold=1.0, dist_threshold=0.25, cmd_topic='/cmd_vel', pose_topic="/odom", lin_pub_rate=50, ang_pub_rate=50):
+    def conditional_publish_path(self, automate_threshold=1.0, dist_threshold=.5, cmd_topic='/cmd_vel', pose_topic="/odom", lin_pub_rate=50, ang_pub_rate=50):
         self.init_publish(cmd_topic, pose_topic, lin_pub_rate, ang_pub_rate)
 
         # Traverse all way points
         all_but_first = self.path[1:]
         for index in range(len(all_but_first)):
             way_point = all_but_first[index]
-            cv2.circle(self.grid, (int(40*self.position[0]), self.grid.shape[0]-int(40*self.position[1])), 5, (255,255,0), -1)
-            self.search_algorithm.show_grid(self.grid, 100, wait=1)
+
+            # Show current pos
+            cv2.circle(self.grid, (int(10*self.position[0]), self.grid.shape[0]-int(10*self.position[1])), 5, (255,255,0), -1)
+            self.search_algorithm.show_grid(self.grid, 300, wait=1)
             while True:
                 way_point = np.array(way_point)
                 dist = math.dist(way_point[:2], self.position[:2])
@@ -265,10 +273,12 @@ class ROSIntegration:
                     rospy.loginfo("At way point")
                     break
 
+                # Switch to automated driving
                 if dist > automate_threshold:
                     rospy.loginfo("Switching to fully automated driving...")
                     rospy.set_param("automate_movement", True)
 
+                # Automate driving
                 if rospy.get_param("automate_movement"):
                     next_way_point = all_but_first[index+1]
                     next_dist = math.dist(next_way_point[:2], self.position[:2])
@@ -297,7 +307,7 @@ if __name__ == '__main__':
 
     # Wait for parameter definitions
     time.sleep(5)
-    os.system('clear')
+    # os.system('clear')
 
     # Action set for discrete moves
     # action_set = RobotActionSetGenerator.gen_robot_discrete_action_set(
@@ -316,14 +326,14 @@ if __name__ == '__main__':
     
     # Declare action set
     action_set = RobotActionSetGenerator.gen_robot_diff_drive_action_set(
-        node_threshold_xy = 0.5,                                    # Euclidean distance threshold for considering two nodes having the same pos
-        node_threshold_theta = 30,                                  # Threshold for considering two nodes having the same angle
-        goal_threshold_xy = 1.5,                                    # Euclidean distance threshold for node being close enough to goal pos
-        goal_threshold_theta = 30                                   # Angle threshold for node being close enough to goal angle
+        node_threshold_xy = 1,                                    # Euclidean distance threshold for considering two nodes having the same pos
+        node_threshold_theta = 10,                                  # Threshold for considering two nodes having the same angle
+        goal_threshold_xy = 10,                                    # Euclidean distance threshold for node being close enough to goal pos
+        goal_threshold_theta = 360                                  # Angle threshold for node being close enough to goal angle
     )
 
     # Run all
-    ros_path_plan = ROSIntegration(search.AStarSearch, maps.GazeboMap, action_set, scale_percent=300,add_frame_frequency=50, framerate=100)
+    ros_path_plan = ROSIntegration(search.RRTStarSearch, maps.GazeboCourseMap, action_set, scale_percent=300,add_frame_frequency=50, framerate=100)
     ros_path_plan.find_path()
     ros_path_plan.conditional_publish_path()
 

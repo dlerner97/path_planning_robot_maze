@@ -2,6 +2,7 @@
 import math
 import heapq
 import numpy as np
+from time import time
 from search_base import Search
 
 #<=============================== BFSSearch Class Definition ===================================>#
@@ -219,7 +220,8 @@ class AStarSearch(Search):
                 return False
                     
             cost_from_first = parent_cost+branch_cost
-            total_cost = cost_from_first + self.weight*math.sqrt((self.goal_pos[0]-pos[0])**2 + (self.goal_pos[1]-pos[1])**2)
+            total_cost = cost_from_first + self.weight*math.dist(self.goal_pos[:2], pos[:2])
+            # math.sqrt((self.goal_pos[0]-pos[0])**2 + (self.goal_pos[1]-pos[1])**2)
             node_info = self.node_info.get(loc_string, None)
             
             # If position corresponds to the winning state, return True
@@ -289,12 +291,12 @@ class RRTStarSearch(Search):
     Executes a RRT* search on the given map with the given action set.
     """    
     
-    def __init__(self, map, action_set, max_iters=1000, check_cost_radius=20, scale_percent=100, add_frame_frequency=100, framerate=100, save_video=True):
+    def __init__(self, map, action_set, max_iters=1250, check_cost_radius=40, scale_percent=100, add_frame_frequency=100, framerate=100, save_video=True):
         super().__init__(map, action_set, cost_algorithm=True, scale_percent=scale_percent, add_frame_frequency=add_frame_frequency, framerate=framerate, save_video=save_video)
         self.check_cost_radius = check_cost_radius
         self.max_iters = max_iters
 
-    # Grabs next node
+    # Grabs next node for RRT* implementation
     def _get_next_branch_rrt(self, parent, pos, action, branch_cost): 
          
         # Check if new position is on the grid
@@ -345,33 +347,30 @@ class RRTStarSearch(Search):
                     self.node_info[loc_string][theta] = {"parent": parent, "action": action, "cost_from_first": cost_from_first}
                     self.node_count += 1
         
+    # Select next node 
     def build_next_node(self):
+        # Choose random pos
         rand_pos = (np.random.randint(self.width), np.random.randint(self.height))
-        
-        # print("====================")
-        # print(f"Random Position: {rand_pos}")
 
+        # Find all visited nodes within the given radius from random state
         keys = list(self.node_info.keys())
-
-        # print(f"keys: {keys}")
-
         int_ = lambda ls: [int(val) for val in ls]
         all_dists = np.array([math.dist(rand_pos, int_(pos_strs.split(" "))) for pos_strs in keys])
         dists_in_rad = np.where(all_dists < self.check_cost_radius)[0]
-
-        # print(f"all dists: {all_dists}")
-        # print(f"dists in rad: {dists_in_rad}")
-        # print(f"visited: {self.node_info}")
         
+        # Select parent node
         best_parent_key = None
         best_theta = None
+        # if no visited nodes within radius...
         if len(dists_in_rad) == 0: 
+            # select the closest node
             best_parent_key = keys[np.argmin(all_dists)]
             items = list(self.node_info[best_parent_key].items())
             cost_ls = [value["cost_from_first"] for _, value in items]
             min_theta_cost_index = np.argmin(cost_ls)
             best_theta = items[min_theta_cost_index][0]
         else:
+            # Choose node with smallest cost to come
             keys_in_rad = [keys[index] for index in dists_in_rad]
             costs = []
             for key in keys_in_rad:
@@ -384,8 +383,8 @@ class RRTStarSearch(Search):
 
         best_parent = int_(best_parent_key.split(" "))
         best_parent.append(best_theta)
-        # print(f"best parent: {best_parent}")
         
+        # Find best action for that given parent
         action_set_moves = []
         action_set_vals = list(self.action_set.values())
         for branch_info in action_set_vals:            
@@ -394,15 +393,10 @@ class RRTStarSearch(Search):
         arg_min = np.argmin([math.dist(rand_pos, moved[:2]) for moved in action_set_moves])
         best_move = action_set_moves[arg_min]
 
-        # print(f"action set moves: {action_set_moves}")
-        # print(f"dist: {[math.dist(rand_pos, moved[:2]) for moved in action_set_moves]}")
-        # print(f"best move: {best_move}")
-
-        # print("====================")
-
+        # Try node
         self._get_next_branch_rrt(best_parent, best_move, branch_info['move'], branch_info['cost'])
-        # self.show_grid(self.grid, wait=1)
     
+    # A* implementation post RRT*
     def _get_next_branch(self, parent, pos, action, branch_cost): 
          
         # Get the new position using tuple addition  
@@ -422,7 +416,8 @@ class RRTStarSearch(Search):
             return False
                 
         cost_from_first = parent_cost+branch_cost
-        total_cost = cost_from_first + math.sqrt((self.goal_pos[0]-pos[0])**2 + (self.goal_pos[1]-pos[1])**2)
+        total_cost = cost_from_first + 2*math.dist(self.goal_pos[:2], pos[:2])
+        # math.sqrt((self.goal_pos[0]-pos[0])**2 + (self.goal_pos[1]-pos[1])**2)
         node_info = self.node_info.get(loc_string, None)
         
         # If position corresponds to the winning state, return True
@@ -431,6 +426,7 @@ class RRTStarSearch(Search):
                 self.node_info[loc_string] = {}
             self.node_info[loc_string][theta] = {"parent": parent, "action": action, "cost_from_first": cost_from_first}
             self.winning_loc = pos
+            print("Found goal pos")
             return True 
 
         # Check if the node has not been visited 
@@ -455,15 +451,18 @@ class RRTStarSearch(Search):
                     
         return False
 
+    # Get next node
     def _check_subsequent_nodes(self, parent):
+        # For every action that results in an equivalent RRT* node...
         found_goal = False
         for branch_info in self.action_set.values():            
             pos = self.get_next_pos(parent[1], branch_info['move'])
             pos_str = self.pos2str(pos)
-            if pos_str in list(self.rrt_node_info):
+            if self.rrt_node_info.get(pos_str, None) is not None:
+                # Try the node
                 found_goal = self._get_next_branch(parent, pos, branch_info['move'], branch_info['cost']) or found_goal
 
-        self.show_grid(self.grid, wait=1, start_pos=self.start_pos, goal_pos=self.goal_pos)
+        # self.show_grid(self.grid, scale_percent=300, wait=1, start_pos=self.start_pos, goal_pos=self.goal_pos)
         
         # If any of these are true, we have reached the goal state. Propogate the true to the next level
         return found_goal
@@ -471,7 +470,9 @@ class RRTStarSearch(Search):
 
     # Find path
     def find_path(self):
+        # Generate RRT* graph
         print("\nGenerating RRT* Graph...")
+        start_time = time()
 
         self.node_count = 0
         count = 0
@@ -490,4 +491,5 @@ class RRTStarSearch(Search):
         orig_parent_loc_string = Search.pos2str(self.start_pos)
         self.node_info = {orig_parent_loc_string : {self.start_pos[2] : {"cost_from_first" : 0}}}
 
-        self._find_path()
+        # Apply A* on graph
+        self._find_path(start_time)

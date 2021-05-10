@@ -33,12 +33,12 @@ if __name__ == '__main__':
     )
 
     # RRT* Searches
-    trial_map = search.RRTStarSearch(maps.TrialMap, action_set, max_iters=5000, check_cost_radius=40, scale_percent=600, add_frame_frequency=50, framerate=100)
-    trial_map.find_path()
+    # trial_map = search.RRTStarSearch(maps.GazeboCourseMap, action_set, max_iters=5000, check_cost_radius=40, scale_percent=100, add_frame_frequency=50, framerate=100)
+    # trial_map.find_path()
     
     # A* Searches
-    # trial_map = search.AStarSearch(maps.TrialMap, action_set, cost_to_follow_weight=1.1, scale_percent=600,add_frame_frequency=50, framerate=100)
-    # trial_map.find_path()
+    trial_map = search.AStarSearch(maps.TrialMap, action_set, cost_to_follow_weight=1.0, scale_percent=600,add_frame_frequency=50, framerate=100)
+    trial_map.find_path()
     
     # cv2.destroyAllWindows()
 

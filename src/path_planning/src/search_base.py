@@ -49,9 +49,16 @@ class VideoBuffer:
             cv2.circle(resized, start_pos[:2], 5, (0,255,0), -1)
             cv2.circle(resized, goal_pos[:2], 5, (0,255,0), -1)
         cv2.imshow("grid",resized)
+
+        wait_orig = wait
         k = cv2.waitKey(wait) & 0xff
         if k == ord('q'):
            exit()
+        elif k == ord('w'):
+            if wait_orig == 0:
+                wait = 1-wait
+            else:
+                wait = wait_orig - wait
            
     # Write frames to feed and save video
     def save(self, video_name, isColor = False):
@@ -186,6 +193,7 @@ class Search(VideoBuffer):
         try: 
 
             start_pos = get_param("start_pos")
+            start_pos[2] = math.degrees(start_pos[2])
             goal_pos = get_param("goal_pos")
             
             set_up_pos = lambda pos: (self.int_(self.map_scaling*pos[0]), self.int_(self.height-1-self.map_scaling*pos[1]), self.int_(pos[2]))
@@ -220,7 +228,8 @@ class Search(VideoBuffer):
         
         # Display grid
         self.scale_percent = scale_percent
-        Search.show_grid(temp_grid, scale_percent, wait=10000)
+        # Search.show_grid(temp_grid, scale_percent, wait=10000)
+        Search.show_grid(temp_grid, scale_percent, wait=0)
         cv2.destroyAllWindows()
         self.scale = 1
         
@@ -397,9 +406,10 @@ class Search(VideoBuffer):
     # This method and the _find_path method are protected since they can not be run alone. This is a general method and does not implement any specific search algorithm.
     # Rather, it should be absorbed by an actual search algorithm (BFS, Dijkstra, etc.). True search algorithm MUST have a method called "_check_subsequent nodes"
     #   and store nodes to the proper queue  
-    def _find_path(self):
+    def _find_path(self, start_time=0):
         print("\nFinding Path...")
-        start_time = time.time()                                # Time path planning
+        if start_time == 0:
+            start_time = time.time()                                # Time path planning
         solution_found = False
         count = 0
         c1 = 0
