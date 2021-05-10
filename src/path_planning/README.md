@@ -1,4 +1,4 @@
-# proj3_dani_lerner
+# Final Project
 
 ## Dependencies
 
